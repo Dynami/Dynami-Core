@@ -1,0 +1,98 @@
+/*
+ * Copyright 2015 Alessandro Atria - a.atria@gmail.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.dynami.core.utils;
+
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+
+public class DUtils {
+	
+	public static final SimpleDateFormat LONG_DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
+	public static final DecimalFormat MONEY_FORMAT = new DecimalFormat("#,###.00");
+	public static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("#.###");
+	public static final DecimalFormat NUMBER_FORMAT = new DecimalFormat("#.0000");
+	
+	public static final double DECIMALS = 4;
+	private static final double FACTOR = Math.pow(10, DECIMALS);
+	
+	public static long d2l(double d){
+		return (long)Math.round((d*FACTOR));
+	}
+	
+	public static double l2d(long l){
+		return (double)l/FACTOR;
+	}
+	
+	public static long max(long ...ds){
+		long out = Long.MIN_VALUE;
+		for(long d : ds){
+			if(d > out)
+				out = d;
+		}
+		return out;
+	}
+	
+	public static long min(long ...ds){
+		long out = Long.MAX_VALUE;
+		for(long d : ds){
+			if(d < out)
+				out = d;
+		}
+		return out;
+	}
+	
+	public static boolean in(Number in, Number...compare){
+		for(Number n:compare){
+			if(n.equals(in)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static String getErrorMessage(Throwable e){
+		StringBuilder buffer = new StringBuilder();
+		Throwable thr;
+		if(e.getCause()!= null && e.getCause().getStackTrace().length >0){
+			thr = e.getCause();
+		} else {
+			thr = e;
+		}
+		
+		String message = (thr.getMessage() != null)?thr.getMessage():e.getMessage();
+		buffer.append((message!=null)?message:e.getMessage());
+		buffer.append(" - ");
+		if(thr.getStackTrace() != null && thr.getStackTrace().length > 0){
+			buffer.append(thr.getClass().getName());
+			buffer.append(" occurred in ");
+			buffer.append(thr.getStackTrace()[0].getClassName());
+			buffer.append("::");
+			buffer.append(thr.getStackTrace()[0].getMethodName());
+			buffer.append("() # ");
+			buffer.append(thr.getStackTrace()[0].getFileName());
+			buffer.append(" at line: ");
+			buffer.append(thr.getStackTrace()[0].getLineNumber());
+		}
+		return buffer.toString();
+	}
+	
+	public static void copy(final long[] src, final double[] dest){
+		for(int i = 0; i < src.length; i++){
+			dest[i] = src[i];
+		}
+	}
+}
