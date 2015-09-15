@@ -95,4 +95,39 @@ public class DUtils {
 			dest[i] = src[i];
 		}
 	}
+	
+	public static void shift(final double[] input, final int shift){
+		for (int i = input.length-1; i >= 0; i--) {
+			if(i >= shift)
+				input[i] = input[i-shift];
+			else
+				input[i] = 0;
+		}
+	}
+	
+	public static void shift(final int[] input, final int shift){
+		for (int i = input.length-1; i >= 0; i--) {
+			if(i >= shift)
+				input[i] = input[i-shift];
+			else
+				input[i] = 0;
+		}
+	}
+	
+	public static void shift(final long[] input, final int shift){
+		for (int i = input.length-1; i >= 0; i--) {
+			if(i >= shift)
+				input[i] = input[i-shift];
+			else
+				input[i] = 0;
+		}
+	}
+	
+	public static int max(int...n){
+		int v = -Integer.MAX_VALUE;
+		for(int i:n){
+			if(i > v) v = i;
+		}
+		return v;
+	}
 }
