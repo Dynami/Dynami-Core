@@ -20,31 +20,31 @@ import java.util.function.BiFunction;
 
 public class Series implements Cloneable {
 	private static final int BUFFER_SIZE = 1024;
-	private long[] data;
+	private double[] data;
 	private int cursor;
-	private long min, max;
+	private double min, max;
 	
 	public Series(){
 		clear();
 	}
 	
-	public Series(long...values){
+	public Series(double...values){
 		clear();
-		for(long d:values){
+		for(double d:values){
 			append(d);
 		}
 	}
 	
-	public long set(int idx, long v){
+	public double set(int idx, double v){
 		assert idx >= 0 && idx < cursor : "Out of range index";
-		long tmp = data[idx]; 
+		double tmp = data[idx]; 
 		data[idx] = v;
 		return tmp;
 	}
 	
-	public void append(long d){
+	public void append(double d){
 		if(cursor >= data.length){
-			long[] tmp = new long[cursor+BUFFER_SIZE];
+			double[] tmp = new double[cursor+BUFFER_SIZE];
 			System.arraycopy(data, 0, tmp, 0, cursor);
 			data = tmp;
 		}
@@ -55,36 +55,36 @@ public class Series implements Cloneable {
 	
 	public void clear(){
 		cursor = 0; 
-		data = new long[BUFFER_SIZE];
+		data = new double[BUFFER_SIZE];
 		min = Long.MAX_VALUE; 
 		max = Long.MIN_VALUE;
 	}
 	
-	public long last(){
+	public double last(){
 		assert cursor > 0 : "No data!";
 		return data[cursor-1];
 	}
 	
-	public long last(int retro){
+	public double last(int retro){
 		assert cursor - retro > 0 : "No data!";
 		return data[cursor-1-retro];
 	}
 	
-	public long first(){
+	public double first(){
 		assert cursor > 0 : "No data!";
 		return data[0];
 	}
 	
-	public long get(int index){
+	public double get(int index){
 		assert cursor >= index  : "No data!";
 		return data[index];
 	}
 	
-	public long max(){
+	public double max(){
 		return max;
 	}
 	
-	public long min(){
+	public double min(){
 		return min;
 	}
 	
@@ -92,8 +92,8 @@ public class Series implements Cloneable {
 		return cursor;
 	}
 	
-	public Iterator<Long> iterator(){
-		return new Iterator<Long>() {
+	public Iterator<Double> iterator(){
+		return new Iterator<Double>() {
 			int index = 0;
 			@Override
 			public boolean hasNext() {
@@ -101,13 +101,13 @@ public class Series implements Cloneable {
 			}
 			 
 			@Override
-			public Long next() {
+			public Double next() {
 				return data[index++];
 			}
 		};
 	}
 	
-	private Series math(Series other, BiFunction<Long, Long, Long> operand){
+	private Series math(Series other, BiFunction<Double, Double, Double> operand){
 		int _otherLength = other.size();
 		int _innerlength = size();
 		assert _otherLength != _innerlength : "Series have different size";
@@ -118,7 +118,7 @@ public class Series implements Cloneable {
 		return _new;
 	}
 	
-	private Series math(long other, BiFunction<Long, Long, Long> operand){
+	private Series math(double other, BiFunction<Double, Double, Double> operand){
 		int _innerlength = size();
 		Series _new = clone();
 		for(int i = 0; i < _innerlength; i++){
@@ -144,19 +144,19 @@ public class Series implements Cloneable {
 		return math(other, (a, b)-> a/b);
 	}
 	
-	public Series add(long other){
+	public Series add(double other){
 		return math(other, (a, b)-> a+b);
 	}
 	
-	public Series substract(long other){
+	public Series substract(double other){
 		return math(other, (a, b)-> a-b);
 	}
 	
-	public Series multiply(long other){
+	public Series multiply(double other){
 		return math(other, (a, b)-> a*b);
 	}
 	
-	public Series divide(long other){
+	public Series divide(double other){
 		return math(other, (a, b)-> a/b);
 	}
 	
@@ -174,7 +174,7 @@ public class Series implements Cloneable {
 	
 	public boolean upperInversion(int lastNvalues){
 		assert size() < lastNvalues : "lastNvalues is bigger than size";
-		long first = last(lastNvalues), last = last(), max = Long.MIN_VALUE, min=Long.MAX_VALUE;
+		double first = last(lastNvalues), last = last(), max = Long.MIN_VALUE, min=Long.MAX_VALUE;
 		for(int i = 0 ; i < lastNvalues; i++){
 			if(last(i) > max) max = last(i);
 			if(last(i) < min) min = last(i);
@@ -185,7 +185,7 @@ public class Series implements Cloneable {
 	
 	public boolean lowerInversion(int lastNvalues){
 		assert size() < lastNvalues : "lastNvalues is bigger than size";
-		long first = last(lastNvalues), last = last(), max = Long.MIN_VALUE, min=Long.MAX_VALUE;
+		double first = last(lastNvalues), last = last(), max = Long.MIN_VALUE, min=Long.MAX_VALUE;
 		for(int i = 0 ; i < lastNvalues; i++){
 			if(last(i) > max) max = last(i);
 			if(last(i) < min) min = last(i);
@@ -194,22 +194,22 @@ public class Series implements Cloneable {
 		return first < max && last < max;
 	}
 	
-	public long[] toArray(){
-		long[] out = new long[cursor];
+	public double[] toArray(){
+		double[] out = new double[cursor];
 		System.arraycopy(data, 0, out, 0, cursor);
 		return out;
 	}
 	
-	public long[] toArray(final int start, final int end){
+	public double[] toArray(final int start, final int end){
 		final int length = end - start;
-		final long[] out = new long[length];
+		final double[] out = new double[length];
 		System.arraycopy(data, start, out, 0, length);
 		return out;
 	}
 	
-	public long[] toArray(final int start){
+	public double[] toArray(final int start){
 		int length = this.cursor - start;
-		long[] out = new long[length];
+		double[] out = new double[length];
 		System.arraycopy(data, start, out, 0, length);
 		return out;
 	}
@@ -217,7 +217,7 @@ public class Series implements Cloneable {
 	@Override
 	protected Series clone() {
 		Series copy = new Series();
-		copy.data = new long[data.length];
+		copy.data = new double[data.length];
 		System.arraycopy(data, 0, copy.data, 0, data.length);
 		copy.cursor = cursor;
 		copy.max = max;

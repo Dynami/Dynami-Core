@@ -21,14 +21,14 @@ public class Bar implements Comparable<Bar> {
 	
 	public final String symbol;
 	public final long time;
-	public final long open;
-	public final long high;
-	public final long low;
-	public final long close;
+	public final double open;
+	public final double high;
+	public final double low;
+	public final double close;
 	public final long volume;
 	public final long openInterest;
 	
-	public Bar(final String symbol, final long open, final long high, final long low, final long close, final long volume, final long openInterest, final long time){
+	public Bar(final String symbol, final double open, final double high, final double low, final double close, final long volume, final long openInterest, final long time){
 		this.symbol = symbol;
 		this.open = open;
 		this.high = high;
@@ -39,7 +39,7 @@ public class Bar implements Comparable<Bar> {
 		this.time = time;
 	}
 	
-	public Bar(final String symbol, final long open, final long high, final long low, final long close, final long volume, final long time){
+	public Bar(final String symbol, final double open, final double high, final double low, final double close, final long volume, final long time){
 		this(symbol, open, high, low, close, volume, 0, time);
 	}
 	
@@ -47,16 +47,16 @@ public class Bar implements Comparable<Bar> {
 		return symbol;
 	}
 	
-	public long getOpen() {
+	public double getOpen() {
 		return open;
 	}
-	public long getHigh() {
+	public double getHigh() {
 		return high;
 	}
-	public long getLow() {
+	public double getLow() {
 		return low;
 	}
-	public long getClose() {
+	public double getClose() {
 		return close;
 	}
 	public long getVolume() {
