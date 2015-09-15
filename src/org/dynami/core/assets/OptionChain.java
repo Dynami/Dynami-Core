@@ -15,34 +15,30 @@
  */
 package org.dynami.core.assets;
 
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.dynami.core.assets.Asset.Option;
 import org.dynami.core.utils.DUtils;
 
 public class OptionChain {
 	private final String parentSymbol;
-	private final TreeMap<Long, TreeMap<Long, TreeMap<Asset.Option.Type, Asset.Option>>> options_tree = new TreeMap<>();
 	private long frontMonthExpire = Long.MAX_VALUE, farMonthExpire = 0;
-//	private final List<OptionRecord> options = new ArrayList<>();
+	private final List<OptionRecord> options = new ArrayList<>();
 	
-//	static class OptionRecord {
-//		private final long expire;
-//		private final long strike;
-//		private final Option.Type type;
-//		private final Option option;
-//		
-//		public OptionRecord(long expire, long strike, Option.Type type, Option option) {
-//			this.expire = expire;
-//			this.strike = strike;
-//			this.type = type;
-//			this.option = option;
-//		}
-//
-//		public long getExpire() { return expire; }
-//		public long getPrice() { return strike; }
-//		public Option.Type getType() { return type; }
-//		public Option getOption() { return option; }
-//	}
+	private static class OptionRecord {
+		private final long expire;
+		private final long strike;
+		private final Option.Type type;
+		private final Option option;
+		
+		public OptionRecord(long expire, long strike, Option.Type type, Option option) {
+			this.expire = expire;
+			this.strike = strike;
+			this.type = type;
+			this.option = option;
+		}
+	}
 	
 	public OptionChain(String parentSymbol) {
 		this.parentSymbol = parentSymbol;
@@ -53,17 +49,10 @@ public class OptionChain {
 	}
 	
 	public void add(Asset.Option opt){
-		options_tree.putIfAbsent(opt.expire, new TreeMap<Long, TreeMap<Asset.Option.Type, Asset.Option>>());
-		options_tree.get(opt.expire).putIfAbsent(opt.strike, new TreeMap<Asset.Option.Type,Asset.Option>());
-		options_tree.get(opt.expire).get(opt.strike).putIfAbsent(opt.type, opt);
+		options.add(new OptionRecord(opt.expire, opt.strike, opt.type, opt));
 		
-//		options.add(new OptionRecord(opt.expire, opt.strike, opt.type, opt));
-		
-		frontMonthExpire = options_tree.firstKey();
-		farMonthExpire = options_tree.lastKey();
-		
-//		if(frontMonthExpire > opt.expire) frontMonthExpire = opt.expire;
-//		if(farMonthExpire < opt.expire) farMonthExpire = opt.expire;
+		if(frontMonthExpire > opt.expire) frontMonthExpire = opt.expire;
+		if(farMonthExpire < opt.expire) farMonthExpire = opt.expire;
 		
 	}
 	
@@ -86,14 +75,26 @@ public class OptionChain {
 	}
 	
 	private Asset.Option getOptionAtPrice(final long expire, final Asset.Option.Type type, final long price){
-		long upperStrike = options_tree.get(expire).ceilingKey(price);
-		long lowerStrike = options_tree.get(expire).floorKey(price);
-		long upperDistance = upperStrike - price;
-		long lowerDistance = price - lowerStrike;
-		if(upperDistance <= lowerDistance){
-			return options_tree.get(expire).get(upperStrike).get(type);
+		OptionRecord[] subset = options.stream()
+									.filter(o->o.expire == expire)
+									.filter(o->o.type.equals(type))
+									.sorted((o1, o2)-> (int)(o1.strike-o2.strike))
+									.toArray(OptionRecord[]::new);
+		
+		OptionRecord upper = subset[subset.length-1], lower = subset[0];
+		
+		for(int i = 0; i < subset.length; i++){
+			if(subset[i].strike <= price) lower = subset[i];
+			if(subset[subset.length-i-1].strike >= price) upper = subset[subset.length-i-1];
+		}
+		
+		long upperDistance = upper.strike - price;
+		long lowerDistance = price - lower.strike;
+		
+		if(upperDistance < lowerDistance){
+			return upper.option;
 		} else {
-			return options_tree.get(expire).get(lowerStrike).get(type);
+			return lower.option;
 		}
 	}
 	
