@@ -67,10 +67,10 @@ public class Book {
 		public final long time;
 		public final Side side;
 		public final int level;
-		public final long price;
+		public final double price;
 		public final long quantity;
 		
-		public Orders(String symbol, long time, Side side, int level, long price, long quantity) {
+		public Orders(String symbol, long time, Side side, int level, double price, long quantity) {
 			this.symbol = symbol;
 			this.time = time;
 			this.side = side;
