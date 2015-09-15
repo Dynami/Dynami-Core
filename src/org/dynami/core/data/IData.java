@@ -28,9 +28,9 @@ public interface IData {
 
 	public Series openInterest();
 	
-	public long getMax();
+	public double getMax();
 
-	public long getMin();
+	public double getMin();
 
 	public long getBegin();
 
