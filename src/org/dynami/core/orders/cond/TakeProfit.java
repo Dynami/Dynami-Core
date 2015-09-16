@@ -4,9 +4,9 @@ import org.dynami.core.assets.Book.Orders;
 import org.dynami.core.orders.OrderRequest.IOrderCondition;
 
 public class TakeProfit implements IOrderCondition {
-	public final long takeProfit;
+	public final double takeProfit;
 	
-	public TakeProfit(long takeProfit){
+	public TakeProfit(double takeProfit){
 		this.takeProfit = takeProfit;
 	}
 	

@@ -4,9 +4,9 @@ import org.dynami.core.assets.Book.Orders;
 import org.dynami.core.orders.OrderRequest.IOrderCondition;
 
 public class StopLoss implements IOrderCondition {
-	public final long stopLossPrice;
+	public final double stopLossPrice;
 	
-	public StopLoss(long stopLossPrice) {
+	public StopLoss(double stopLossPrice) {
 		this.stopLossPrice = stopLossPrice;
 	}
 	
