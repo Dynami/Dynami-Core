@@ -15,8 +15,10 @@
  */
 package org.dynami.core.services;
 
+import java.util.Collection;
+
 public interface IPortfolioService {
 	public static final String ID = "IPortfolioService";
-	
-	
+
+
 }

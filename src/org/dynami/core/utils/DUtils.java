@@ -124,7 +124,7 @@ public class DUtils {
 	}
 	
 	public static int max(int...n){
-		int v = -Integer.MAX_VALUE;
+		int v = Integer.MIN_VALUE;
 		for(int i:n){
 			if(i > v) v = i;
 		}
