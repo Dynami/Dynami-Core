@@ -15,7 +15,6 @@
  */
 package org.dynami.core.services;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import org.dynami.core.utils.DUtils;
