@@ -30,6 +30,7 @@ public class Book {
 		public void update(boolean last, Object msg) {
 			if(last && msg instanceof Orders){
 				Orders item = (Orders)msg;
+//				System.out.println("Book.enclosing_method() "+item);
 				if(Side.ASK.equals(item.side)){
 					askSide.set(item.level-1, item);
 				} else {
@@ -78,6 +79,14 @@ public class Book {
 			this.price = price;
 			this.quantity = quantity;
 		}
+
+		@Override
+		public String toString() {
+			return "Orders [symbol=" + symbol + ", time=" + time + ", side=" + side + ", level=" + level + ", price="
+					+ price + ", quantity=" + quantity + "]";
+		}
+		
+		
 	}
 	
 	public static enum Side { ASK, BID }

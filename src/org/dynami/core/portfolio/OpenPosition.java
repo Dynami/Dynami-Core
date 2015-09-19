@@ -39,4 +39,10 @@ public class OpenPosition {
 	public long getCurrentTime() {
 		return currentTime;
 	}
+
+	@Override
+	public String toString() {
+		return "OpenPosition [symbol=" + symbol + ", quantity=" + quantity + ", entryPrice=" + entryPrice
+				+ ", entryTime=" + entryTime + ", pointValue=" + pointValue + ", currentTime=" + currentTime + "]";
+	}
 }

@@ -17,7 +17,7 @@ public class StopLoss implements IOrderCondition {
 	
 	@Override
 	public String toString() {
-		return "Stop @ "+stopLossPrice;
+		return "StopLoss@"+String.format("%5.2f", stopLossPrice);
 	}
 	
 }

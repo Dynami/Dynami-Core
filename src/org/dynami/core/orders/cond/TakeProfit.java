@@ -17,6 +17,6 @@ public class TakeProfit implements IOrderCondition {
 	
 	@Override
 	public String toString() {
-		return "TakeProfit @ "+takeProfit;
+		return "TakeProfit@"+String.format("%5.2f", takeProfit);
 	}
 }

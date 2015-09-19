@@ -37,4 +37,15 @@ public class ClosedPosition {
 		this.exitTime = exitTime;
 		this.pointValue = pointValue;
 	}
+	
+	public double roi(){
+		return (exitPrice-entryPrice)*quantity*pointValue;
+	}
+
+	@Override
+	public String toString() {
+		return "ClosedPosition [symbol=" + symbol + ", quantity=" + quantity + ", entryPrice=" + entryPrice
+				+ ", entryTime=" + entryTime + ", exitPrice=" + exitPrice + ", exitTime=" + exitTime + ", pointValue="
+				+ pointValue + "]";
+	}
 }
