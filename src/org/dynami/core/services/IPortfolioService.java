@@ -17,8 +17,36 @@ package org.dynami.core.services;
 
 import java.util.Collection;
 
+import org.dynami.core.portfolio.ClosedPosition;
+import org.dynami.core.portfolio.ExecutedOrder;
+import org.dynami.core.portfolio.OpenPosition;
+
 public interface IPortfolioService {
 	public static final String ID = "IPortfolioService";
 
+	public void setInitialBudget(double budget);
 
+	public double getCurrentBudget();
+
+	public boolean isOnMarket();
+
+	public boolean isOnMarket(String symbol);
+
+	public boolean isLong(String symbol);
+
+	public boolean isShort(String symbol);
+
+	public Collection<OpenPosition> getOpenPosition();
+
+	public OpenPosition getPosition(String symbol);
+
+	public Collection<ClosedPosition> getClosedPosition();
+
+	public Collection<ClosedPosition> getClosedPosition(String symbol);
+
+	public double realized();
+
+	public double unrealized();
+
+	public Collection<ExecutedOrder> executedOrdersLog();
 }

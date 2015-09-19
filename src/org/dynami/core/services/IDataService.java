@@ -21,32 +21,40 @@ import org.dynami.core.data.IData;
 
 public interface IDataService {
 	public static final String ID = "IDataService";
-	
+
 	/**
-	 * Retrieves all historical data with default compression for the given symbol  
+	 * Retrieves all historical data with default compression for the given symbol
 	 * @param symbol
 	 * @return {@link IData}
 	 */
 	public IData history(String symbol);
-	
+
 	/**
 	 * Retrieves all historical data with desired compression for the given symbol
 	 * @param symbol
 	 * @param timeFrame @see {@link COMPRESSION_UNIT}
-	 * @param units es. with COMPRESSION_UNIT.MINUTE and 5 units, all historical data are compressed in five minutes bars. 
+	 * @param units es. with COMPRESSION_UNIT.MINUTE and 5 units, all historical data are compressed in five minutes bars.
 	 * @return {@link IData}
 	 */
 	public IData history(String symbol, long timeFrame, int units);
-	
+
 	/**
 	 * Retrieves all historical data with default compression for the given symbol and time range
 	 * @param symbol
 	 * @param from
-	 * @param to nullable, whether null parameter is ignored 
+	 * @param to nullable, whether null parameter is ignored
 	 * @return {@link IData}
 	 */
 	public IData history(String symbol, Date from, Date to);
-	
-	
+
+	/**
+	 * Retrieves the historical data for the given range with the desired compression for the given symbol
+	 * @param symbol
+	 * @param from
+	 * @param to
+	 * @param timeFrame @see {@link COMPRESSION_UNIT}
+	 * @param units es. with COMPRESSION_UNIT.MINUTE and 5 units, all historical data are compressed in five minutes bars.
+	 * @return {@link IData}
+	 */
 	public IData history(String symbol, Date from, Date to, long timeFrame, int units);
 }
