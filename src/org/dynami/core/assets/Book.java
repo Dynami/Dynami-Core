@@ -25,17 +25,22 @@ public class Book {
 	private transient final AtomicReferenceArray<Book.Orders> askSide = new AtomicReferenceArray<>(BOOK_DEEP);
 	private transient final AtomicReferenceArray<Book.Orders> bidSide = new AtomicReferenceArray<>(BOOK_DEEP);
 	
-	public final IMsg.Handler ordersBookHandler = new IMsg.Handler() {
+	public final IMsg.Handler askBookOrdersHandler = new IMsg.Handler() {
 		@Override
 		public void update(boolean last, Object msg) {
 			if(last && msg instanceof Orders){
 				Orders item = (Orders)msg;
-//				System.out.println("Book.enclosing_method() "+item);
-				if(Side.ASK.equals(item.side)){
-					askSide.set(item.level-1, item);
-				} else {
-					bidSide.set(item.level-1, item);
-				}
+				askSide.set(item.level-1, item);
+			}
+		}
+	};
+	
+	public final IMsg.Handler bidBookOrdersHandler = new IMsg.Handler() {
+		@Override
+		public void update(boolean last, Object msg) {
+			if(last && msg instanceof Orders){
+				Orders item = (Orders)msg;
+				bidSide.set(item.level-1, item);
 			}
 		}
 	};
