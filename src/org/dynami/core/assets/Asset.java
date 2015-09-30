@@ -35,6 +35,13 @@ public abstract class Asset implements Comparable<Asset> {
 		return super.equals(obj);
 	};
 	
+	public Asset.Tradable asTradable(){
+		if(this instanceof Asset.Tradable)
+			return (Asset.Tradable)this;
+		else
+			return null;
+	}
+	
 	private Asset(Family family, String symbol, String isin, String name, double pointValue, long tick, String market){
 		this.family = family;
 		this.symbol = symbol;
