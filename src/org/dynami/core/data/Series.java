@@ -61,12 +61,12 @@ public class Series implements Cloneable {
 	}
 	
 	public double last(){
-		assert cursor > 0 : "No data!";
+		assert cursor < 1 : "No data!";
 		return data[cursor-1];
 	}
 	
 	public double last(int retro){
-		assert cursor - retro > 0 : "No data!";
+		assert cursor - retro < 1 : "No data!";
 		return data[cursor-1-retro];
 	}
 	
@@ -192,6 +192,22 @@ public class Series implements Cloneable {
 		}
 		
 		return first < max && last < max;
+	}
+	
+	public boolean crossesOver(Series s2){
+		return last(1) <= s2.last(1) && last() > s2.last();
+	}
+	
+	public boolean crossesOver(double threshold){
+		return last(1) <= threshold && last() > threshold;
+	}
+	
+	public boolean crossesUnder(Series s2){
+		return last(1) >= s2.last(1) && last() < s2.last();
+	}
+	
+	public boolean crossesUnder(double threshold){
+		return last(1) >= threshold && last() < threshold;
 	}
 	
 	public double[] toArray(){
