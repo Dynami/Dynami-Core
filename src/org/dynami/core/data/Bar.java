@@ -78,7 +78,6 @@ public class Bar implements Comparable<Bar> {
 
 	@Override
 	public String toString() {
-		return symbol + " " + DUtils.LONG_DATE_FORMAT.format(time) + " O:" + open + " H:" + high + " L:" + low
-				+ " C:" + close + " V:" + volume + " OI:" + openInterest;
+		return String.format("%10s\t%18s\tO:%8.2f\tH:%8.2f\tL:%8.2f\tC:%8.2f\tV:%12s\tOI:%12s", symbol, DUtils.LONG_DATE_FORMAT.format(time), open, high, low, close, volume, openInterest);
 	}
 }
