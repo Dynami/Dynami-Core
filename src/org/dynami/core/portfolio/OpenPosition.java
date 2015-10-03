@@ -15,6 +15,8 @@
  */
 package org.dynami.core.portfolio;
 
+import org.dynami.core.utils.DUtils;
+
 public class OpenPosition {
 	public final String symbol;
 	public final long quantity;
@@ -42,7 +44,7 @@ public class OpenPosition {
 
 	@Override
 	public String toString() {
-		return "OpenPosition [symbol=" + symbol + ", quantity=" + quantity + ", entryPrice=" + entryPrice
-				+ ", entryTime=" + entryTime + ", pointValue=" + pointValue + ", currentTime=" + currentTime + "]";
+		return "OpenPosition [symbol=" + symbol + ", quantity=" + quantity + ", entryPrice=" + String.format("%5.2f", entryPrice)
+				+ ", entryTime=" + DUtils.LONG_DATE_FORMAT.format(entryTime) + ", pointValue=" + pointValue + ", currentTime=" + DUtils.LONG_DATE_FORMAT.format(currentTime) + "]";
 	}
 }

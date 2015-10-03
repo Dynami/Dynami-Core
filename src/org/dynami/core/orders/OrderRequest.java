@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.dynami.core.assets.Book;
+import org.dynami.core.utils.DUtils;
 
 /**
  * @author Atria
@@ -33,12 +34,12 @@ public abstract class OrderRequest {
 	public final long id;
 	public final long time;
 	public final String symbol;
-	public final long price;
+	public final double price;
 	public final long quantity;
 	public final String note;
 	private final List<IOrderCondition> conditions = new ArrayList<>();
 	
-	public OrderRequest(String symbol, long quantity, long price, String note){
+	public OrderRequest(String symbol, long quantity, double price, String note){
 		this.time = System.currentTimeMillis();
 		this.symbol = symbol;
 		this.price = price;
@@ -47,7 +48,7 @@ public abstract class OrderRequest {
 		this.id = generateUniqueId();
 	}
 	
-	public OrderRequest(String symbol, long quantity, long price){
+	public OrderRequest(String symbol, long quantity, double price){
 		this.time = System.currentTimeMillis();
 		this.symbol = symbol;
 		this.price = price;
@@ -80,7 +81,7 @@ public abstract class OrderRequest {
 
 	@Override
 	public String toString() {
-		return "OrderRequest [id=" + id + ", time=" + time + ", symbol=" + symbol + ", price=" + price + ", quantity="
+		return "OrderRequest [id=" + id + ", time=" + DUtils.LONG_DATE_FORMAT.format(time) + ", symbol=" + symbol + ", price=" + String.format("%5.2f", price) + ", quantity="
 				+ quantity + ", note=" + note + ", conditions=" + conditions + "]";
 	}
 	

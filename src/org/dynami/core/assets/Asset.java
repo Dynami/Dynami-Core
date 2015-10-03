@@ -22,7 +22,7 @@ public abstract class Asset implements Comparable<Asset> {
 	public final String isin;
 	public final String name;
 	public final double pointValue;
-	public final long tick;
+	public final double tick;
 	
 	public int compareTo(Asset o) {
 		return symbol.compareTo(o.symbol);
@@ -42,7 +42,7 @@ public abstract class Asset implements Comparable<Asset> {
 			return null;
 	}
 	
-	private Asset(Family family, String symbol, String isin, String name, double pointValue, long tick, String market){
+	private Asset(Family family, String symbol, String isin, String name, double pointValue, double tick, String market){
 		this.family = family;
 		this.symbol = symbol;
 		this.isin = isin;
@@ -53,7 +53,7 @@ public abstract class Asset implements Comparable<Asset> {
 	}
 	
 	public static class Index extends Asset {
-		public Index(Family family, String symbol, String isin, String name, double pointValue, long tick, String market) {
+		public Index(Family family, String symbol, String isin, String name, double pointValue, double tick, String market) {
 			super(family, symbol, isin, name, pointValue, tick, market);
 		}
 	}
@@ -61,21 +61,21 @@ public abstract class Asset implements Comparable<Asset> {
 	public static abstract class Tradable extends Asset {
 		public final double requiredMargin;
 		public final Book book = new Book();
-		public Tradable(Family family, String symbol, String isin, String name, double pointValue, long tick, String market, final double requiredMargin) {
+		public Tradable(Family family, String symbol, String isin, String name, double pointValue, double tick, String market, final double requiredMargin) {
 			super(family, symbol, isin, name, pointValue, tick, market);
 			this.requiredMargin = requiredMargin;
 		}
 	}
 	
 	public static class Share extends Tradable {
-		public Share(String symbol, String isin, String name, double pointValue, long tick, double requiredMargin, String market) {
+		public Share(String symbol, String isin, String name, double pointValue, double tick, double requiredMargin, String market) {
 			super(Family.Equity, symbol, isin, name, pointValue, tick, market, requiredMargin);
 		}
 	}
 	
 	public static abstract class DerivativeInstr extends Tradable {
 		public final String parentSymbol;
-		public DerivativeInstr(Family family, String symbol, String isin, String name, double pointValue, long tick, String market, double requiredMargin, String parentSymbol) {
+		public DerivativeInstr(Family family, String symbol, String isin, String name, double pointValue, double tick, String market, double requiredMargin, String parentSymbol) {
 			super(family, symbol, isin, name, pointValue, tick, market, requiredMargin);
 			this.parentSymbol = parentSymbol;
 		}
@@ -84,7 +84,7 @@ public abstract class Asset implements Comparable<Asset> {
 	private static abstract class ExpiringInstr extends DerivativeInstr {
 		public final long expire;
 		public final long lotSize;
-		public ExpiringInstr(Family family, String symbol, String isin, String name, double pointValue, long tick, String market, double requiredMargin, long expire, long lotSize, String parentSymbol) {
+		public ExpiringInstr(Family family, String symbol, String isin, String name, double pointValue, double tick, String market, double requiredMargin, long expire, long lotSize, String parentSymbol) {
 			super(family, symbol, isin, name, pointValue, tick, market, requiredMargin, parentSymbol);
 			this.expire = expire;
 			this.lotSize = lotSize;
@@ -97,7 +97,7 @@ public abstract class Asset implements Comparable<Asset> {
 		public final Greeks greeks;
 		public static enum Type { CALL, PUT }
 		
-		public Option(String symbol, String isin, String name, double pointValue, long tick, double requiredMargin,  String market, long expire, long lotSize, String parentSymbol, long strike, Type type, Greeks.Engine greeksEngine){
+		public Option(String symbol, String isin, String name, double pointValue, double tick, double requiredMargin,  String market, long expire, long lotSize, String parentSymbol, long strike, Type type, Greeks.Engine greeksEngine){
 			super(Family.Option, symbol, isin, name, pointValue, tick, market, requiredMargin, expire, lotSize, parentSymbol);
 			this.strike = strike;
 			this.type = type;
@@ -110,7 +110,7 @@ public abstract class Asset implements Comparable<Asset> {
 	}
 	
 	public static class Future extends ExpiringInstr {
-		public Future(String symbol, String isin, String name, double pointValue, long tick, double requiredMargin, String market, long expire, long lotSize, String parentSymbol) {
+		public Future(String symbol, String isin, String name, double pointValue, double tick, double requiredMargin, String market, long expire, long lotSize, String parentSymbol) {
 			super(Family.Future, symbol, isin, name, pointValue, tick, market, requiredMargin, expire, lotSize, parentSymbol);
 		}
 	}

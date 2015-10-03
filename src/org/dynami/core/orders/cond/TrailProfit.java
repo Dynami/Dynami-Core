@@ -25,8 +25,8 @@ public class TrailProfit implements IOrderCondition {
 	
 	public TrailProfit(double startTrail, double trailPerc) {
 		this.startTrail = startTrail;
-		threshold = startTrail;
-		exitThreshold = startTrail*(1-trailPerc);
+		threshold = startTrail*(1+trailPerc);
+		exitThreshold = startTrail;
 	}
 
 	@Override
@@ -52,6 +52,6 @@ public class TrailProfit implements IOrderCondition {
 	
 	@Override
 	public String toString() {
-		return "TrailProfit@"+String.format("%5.2f", exitThreshold);
+		return "TrailProfit@"+String.format("%5.2f", threshold);
 	}
 }

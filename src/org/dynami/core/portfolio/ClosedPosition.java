@@ -44,8 +44,8 @@ public class ClosedPosition {
 
 	@Override
 	public String toString() {
-		return "ClosedPosition [symbol=" + symbol + ", quantity=" + quantity + ", entryPrice=" + entryPrice
-				+ ", entryTime=" + entryTime + ", exitPrice=" + exitPrice + ", exitTime=" + exitTime + ", pointValue="
-				+ pointValue + "]";
+		return "ClosedPosition [symbol=" + symbol + ", quantity=" + quantity + ", entryPrice=" + String.format("%5.2f", entryPrice)
+				+ ", entryTime=" + entryTime + ", exitPrice=" + String.format("%5.2f", exitPrice) + ", exitTime=" + exitTime + ", pointValue="
+				+ pointValue + "] "+String.format("%5.2f", roi());
 	}
 }
