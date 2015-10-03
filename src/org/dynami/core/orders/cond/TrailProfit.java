@@ -18,21 +18,40 @@ package org.dynami.core.orders.cond;
 import org.dynami.core.assets.Book.Orders;
 import org.dynami.core.orders.OrderRequest.IOrderCondition;
 
-public class StopLoss implements IOrderCondition {
-	public final double stopLossPrice;
+public class TrailProfit implements IOrderCondition {
+	private final double startTrail;
+	private double threshold, exitThreshold ;
 	
-	public StopLoss(double stopLossPrice) {
-		this.stopLossPrice = stopLossPrice;
+	
+	public TrailProfit(double startTrail, double trailPerc) {
+		this.startTrail = startTrail;
+		threshold = startTrail;
+		exitThreshold = startTrail*(1-trailPerc);
 	}
-	
+
 	@Override
 	public boolean check(long quantity, Orders bid, Orders ask) {
-		return quantity>0? stopLossPrice >= bid.price : stopLossPrice <= ask.price;
+		if(quantity > 0 ){
+			if(threshold < bid.price){
+				exitThreshold += bid.price-threshold;
+				threshold = bid.price;
+			}
+		} else {
+			if(threshold > ask.price){
+				exitThreshold += ask.price-threshold;
+				threshold = ask.price;
+			}
+		}
+		
+		if(quantity > 0){
+			return (exitThreshold > startTrail && bid.price < exitThreshold);
+		} else {
+			return (exitThreshold < startTrail && ask.price > exitThreshold);
+		}
 	}
 	
 	@Override
 	public String toString() {
-		return "StopLoss@"+String.format("%5.2f", stopLossPrice);
+		return "TrailProfit@"+String.format("%5.2f", exitThreshold);
 	}
-	
 }

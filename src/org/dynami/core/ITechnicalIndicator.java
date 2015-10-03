@@ -32,6 +32,8 @@ public interface ITechnicalIndicator {
 	
 	public String getDescription();
 	
+	public void reset();
+	
 //	public default void compute(Series in1){};
 //	public default void compute(Series in1, Series in2){}
 //	public default void compute(Series in1, Series in2, Series in3){};
