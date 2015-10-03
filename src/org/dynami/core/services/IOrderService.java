@@ -38,6 +38,11 @@ public interface IOrderService {
 	 * @return order request unique identifier
 	 */
 	public long send(OrderRequest order);
+	
+	/**
+	 * Removes every pending orders and pending conditions such as stop loss or take profit
+	 */
+	public void removePendings();
 
 	/**
 	 * Retrieves a specified order request, or null if not founded
