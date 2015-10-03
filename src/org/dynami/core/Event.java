@@ -27,21 +27,30 @@ import org.dynami.core.data.Bar;
 public class Event implements Comparable<Event> {
 	public final long id;
 	public final String symbol;
-	public final Type type;
+	public final int types; 
 	public final Bar bar;
 	public final Book.Orders item;
 	
-	private Event(long id, String symbol, Type type, Bar bar, Book.Orders item) {
+	private Event(long id, String symbol, Bar bar, Book.Orders item, Type...type) {
 		this.id = id;
 		this.symbol = symbol;
-		this.type = type;
 		this.bar = bar;
 		this.item = item;
+		int sum = 0;
+		for(Type t:type){
+			sum |= t.value(); 
+		}
+		types = sum;
 	}
+	
+	public boolean is(Type type){
+		return (types^type.value()) < types;
+	}
+	
 	
 	@Override
 	public int compareTo(Event o) {
-		return (symbol+"."+type).compareTo(o.symbol+"."+o.type);
+		return (symbol+"."+types).compareTo(o.symbol+"."+o.types);
 	}
 	
 	/**
@@ -105,21 +114,30 @@ public class Event implements Comparable<Event> {
 	}
 	
 	public static enum Type {
-		OnBarClose,
-		OnBarOpen,
-		OnDayClose,
-		OnDayOpen,
-		OnTick
+		OnBarClose(1),
+		OnBarOpen(2),
+		OnDayClose(4),
+		OnDayOpen(8),
+		OnTick(16);
+		
+		private final int idx;
+		Type(int i){
+			idx = i;
+		}
+		
+		int value() {
+			return idx;
+		}
 	}
 	
 	public final static class Factory {
 		private static final AtomicLong count = new AtomicLong(0L);
-		public static Event create(String symbol, Type type, Bar bar){
-			return new Event(count.incrementAndGet(), symbol, type, bar, null);
+		public static Event create(String symbol, Bar bar, Type...type){
+			return new Event(count.incrementAndGet(), symbol, bar, null, type);
 		}
 		
 		public static Event create(String symbol, Book.Orders item){
-			return new Event(count.incrementAndGet(), symbol, Type.OnTick, null, item);
+			return new Event(count.incrementAndGet(), symbol, null, item, Type.OnTick);
 		}
 	}
 }
