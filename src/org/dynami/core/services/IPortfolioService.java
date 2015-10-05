@@ -29,8 +29,12 @@ public interface IPortfolioService {
 	public double getCurrentBudget();
 
 	public boolean isOnMarket();
+	
+	public boolean isFlat();
 
 	public boolean isOnMarket(String symbol);
+	
+	public boolean isFlat(String symbol);
 
 	public boolean isLong(String symbol);
 

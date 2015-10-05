@@ -210,6 +210,22 @@ public class Series implements Cloneable {
 		return last(1) >= threshold && last() < threshold;
 	}
 	
+	public boolean isGreaterThan(Series s2){
+		return last() > s2.last();
+	}
+	
+	public boolean isGreaterThan(double threshold){
+		return last() > threshold;
+	}
+	
+	public boolean isLowerThan(Series s2){
+		return last() < s2.last();
+	}
+	
+	public boolean isLowerThan(double threshold){
+		return last() < threshold;
+	}
+	
 	public double[] toArray(){
 		double[] out = new double[cursor];
 		System.arraycopy(data, 0, out, 0, cursor);
