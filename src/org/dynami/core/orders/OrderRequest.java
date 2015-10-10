@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.dynami.core.assets.Book;
+import org.dynami.core.utils.DTime;
 import org.dynami.core.utils.DUtils;
 
 /**
@@ -40,7 +41,7 @@ public abstract class OrderRequest {
 	private final List<IOrderCondition> conditions = new ArrayList<>();
 	
 	public OrderRequest(String symbol, long quantity, double price, String note){
-		this.time = System.currentTimeMillis();
+		this.time = DTime.Clock.getTime();
 		this.symbol = symbol;
 		this.price = price;
 		this.quantity = quantity;
@@ -49,7 +50,7 @@ public abstract class OrderRequest {
 	}
 	
 	public OrderRequest(String symbol, long quantity, double price){
-		this.time = System.currentTimeMillis();
+		this.time = DTime.Clock.getTime();
 		this.symbol = symbol;
 		this.price = price;
 		this.quantity = quantity;

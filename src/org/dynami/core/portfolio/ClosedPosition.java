@@ -15,6 +15,8 @@
  */
 package org.dynami.core.portfolio;
 
+import org.dynami.core.utils.DUtils;
+
 public class ClosedPosition {
 	public final String symbol;
 	public final long quantity;
@@ -45,7 +47,7 @@ public class ClosedPosition {
 	@Override
 	public String toString() {
 		return "ClosedPosition [symbol=" + symbol + ", quantity=" +String.format("%3s", quantity) + ", entryPrice=" + String.format("%5.2f", entryPrice)
-				+ ", entryTime=" + entryTime + ", exitPrice=" + String.format("%5.2f", exitPrice) + ", exitTime=" + exitTime + ", pointValue="
+				+ ", entryTime=" + DUtils.LONG_DATE_FORMAT.format(entryTime) + ", exitPrice=" + String.format("%5.2f", exitPrice) + ", exitTime=" + DUtils.LONG_DATE_FORMAT.format(exitTime) + ", pointValue="
 				+ pointValue + "] "+String.format("%5.2f", roi());
 	}
 }
