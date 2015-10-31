@@ -16,6 +16,7 @@
 package org.dynami.core.services;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.dynami.core.portfolio.ClosedPosition;
 import org.dynami.core.portfolio.ExecutedOrder;
@@ -42,13 +43,13 @@ public interface IPortfolioService {
 
 	public boolean isShort(String symbol);
 
-	public Collection<OpenPosition> getOpenPosition();
+	public List<OpenPosition> getOpenPosition();
 
 	public OpenPosition getPosition(String symbol);
 
-	public Collection<ClosedPosition> getClosedPosition();
+	public List<ClosedPosition> getClosedPosition();
 
-	public Collection<ClosedPosition> getClosedPosition(String symbol);
+	public List<ClosedPosition> getClosedPosition(String symbol);
 
 	public double realized();
 
