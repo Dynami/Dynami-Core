@@ -25,6 +25,8 @@ public interface IPortfolioService {
 	public static final String ID = "IPortfolioService";
 
 	public void setInitialBudget(double budget);
+	
+	public double getInitialBudget();
 
 	public double getCurrentBudget();
 
