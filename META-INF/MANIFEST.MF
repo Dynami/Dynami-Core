@@ -6,7 +6,6 @@ Bundle-Version: 1.0.0.Anna
 Bundle-Vendor: Alessandro Atria
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.dynami.core,
- org.dynami.core.asset,
  org.dynami.core.assets,
  org.dynami.core.bus,
  org.dynami.core.config,
