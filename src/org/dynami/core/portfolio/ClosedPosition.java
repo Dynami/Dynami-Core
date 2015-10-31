@@ -43,6 +43,11 @@ public class ClosedPosition {
 	public double roi(){
 		return (exitPrice-entryPrice)*quantity*pointValue;
 	}
+	
+	public double percRoi(){
+		return Math.log(exitPrice/entryPrice)*((quantity>0)?1:-1);
+	}
+	
 
 	@Override
 	public String toString() {
