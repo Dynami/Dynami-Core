@@ -84,35 +84,70 @@ public abstract class Asset implements Comparable<Asset> {
 	private static abstract class ExpiringInstr extends DerivativeInstr {
 		public final long expire;
 		public final long lotSize;
-		public ExpiringInstr(Family family, String symbol, String isin, String name, double pointValue, double tick, String market, double requiredMargin, long expire, long lotSize, String parentSymbol) {
+		public final RiskFreeRate riskFreeRate;
+		
+		public ExpiringInstr(Family family, String symbol, String isin, String name, double pointValue, double tick, String market, double requiredMargin, long expire, long lotSize, String parentSymbol, RiskFreeRate riskFreeRate) {
 			super(family, symbol, isin, name, pointValue, tick, market, requiredMargin, parentSymbol);
 			this.expire = expire;
 			this.lotSize = lotSize;
+			this.riskFreeRate = riskFreeRate;
 		}
 	}
 	
 	public static class Option extends ExpiringInstr {
-		public final long strike;
+		public final double strike;
 		public final Type type;
 		public final Greeks greeks;
+		public final Greeks.Engine greeksEngine;
+		public final Greeks.ImpliedVolatility implVola;
+		private double impliedVolatility;
 		public static enum Type { CALL, PUT }
 		
-		public Option(String symbol, String isin, String name, double pointValue, double tick, double requiredMargin,  String market, long expire, long lotSize, String parentSymbol, long strike, Type type, Greeks.Engine greeksEngine){
-			super(Family.Option, symbol, isin, name, pointValue, tick, market, requiredMargin, expire, lotSize, parentSymbol);
+		public Option(String symbol, String isin, String name, double pointValue, double tick, double requiredMargin,  
+				String market, long expire, long lotSize, String parentSymbol, RiskFreeRate riskFreeRate, 
+				double strike, Type type,  Greeks.Engine greeksEngine, Greeks.ImpliedVolatility implVola){
+			super(Family.Option, symbol, isin, name, pointValue, tick, market, requiredMargin, expire, lotSize, parentSymbol, riskFreeRate);
 			this.strike = strike;
 			this.type = type;
-			this.greeks = new Greeks(greeksEngine);
+			this.greeks = new Greeks();
+			this.greeksEngine = greeksEngine;
+			this.implVola = implVola;
+			
+			book.addBookListener((ask, bid)->{
+				double rf = riskFreeRate.get();
+				double optionMidPrice = (ask.price+bid.price)/2.;
+				long time = Math.max(ask.time, bid.time);
+				impliedVolatility = implVola.estimate(parentSymbol,  time, type, expire, strike, optionMidPrice, rf);
+				greeksEngine.evaluate(greeks, time, type, expire, strike, optionMidPrice, impliedVolatility, rf);
+			});
 		}
 		
 		public Greeks greeks() {
 			return greeks;
 		}
+		
+		public double getStrike() {
+			return strike;
+		}
+		
+		public Type getType() {
+			return type;
+		}
+		public double getImpliedVolatility() {
+			return impliedVolatility;
+		}
+		
 	}
 	
 	public static class Future extends ExpiringInstr {
-		public Future(String symbol, String isin, String name, double pointValue, double tick, double requiredMargin, String market, long expire, long lotSize, String parentSymbol) {
-			super(Family.Future, symbol, isin, name, pointValue, tick, market, requiredMargin, expire, lotSize, parentSymbol);
+		public Future(String symbol, String isin, String name, double pointValue, double tick, double requiredMargin, String market, long expire, long lotSize, String parentSymbol, RiskFreeRate riskFreeRate) {
+			super(Family.Future, symbol, isin, name, pointValue, tick, market, requiredMargin, expire, lotSize, parentSymbol, riskFreeRate);
 		}
+	}
+	
+	@FunctionalInterface
+	public static interface RiskFreeRate {
+		public double get();
 	}
 	
 	public enum Family{

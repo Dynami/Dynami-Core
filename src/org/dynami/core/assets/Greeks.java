@@ -15,27 +15,42 @@
  */
 package org.dynami.core.assets;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.dynami.core.assets.Asset.Option.Type;
+
 public class Greeks {
-	private final double[] greeks = new double[5];
-	private final Engine engine;
-	public Greeks(Engine engine){
-		this.engine = engine;
+	private double delta, gamma, vega, theta, rho;
+	
+	public double delta() {return delta;}
+	public double gamma() {return gamma;}
+	public double vega() {return vega;}
+	public double theta() {return theta;}
+	public double rho() {return rho;}
+	
+	public void setGreeks(double delta, double gamma, double vega, double theta, double rho){
+		Lock lock = new ReentrantLock();
+		if(lock.tryLock()){
+			try {
+				this.delta=delta;
+				this.gamma = gamma;
+				this.vega = vega;
+				this.theta= theta;
+				this.rho = rho;
+			} finally {
+				lock.unlock();
+			}
+		}
 	}
-	
-	public double delta() {return greeks[DELTA];}
-	public double gamma() {return greeks[GAMMA];}
-	public double vega() {return greeks[VEGA];}
-	public double theta() {return greeks[THETA];}
-	public double rho() {return greeks[RHO];}
-	
+
 	@FunctionalInterface
 	public static interface Engine {
-		public double[] evaluate(long date, Asset.Option.Type type, long price, double vola, double interestRate);
+		public void evaluate(Greeks output, long time, Asset.Option.Type type, long expire, double strike, double price, double vola, double interestRate);
 	}
 	
-	private static final int DELTA = 0;
-	private static final int GAMMA = 1;
-	private static final int VEGA = 2;
-	private static final int THETA = 3;
-	private static final int RHO = 4;
+	@FunctionalInterface
+	public static interface ImpliedVolatility {
+		public double estimate(String underlyingSymbol, long time, Type type, long expire, double strike, double optionPrice, double riskFreeRate);
+	}
 }

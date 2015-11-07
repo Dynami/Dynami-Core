@@ -17,14 +17,31 @@ package org.dynami.core.utils;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class DUtils {
+	public static final long DAY_MILLIS = 24*60*60*1000L;
 	
 	public static final SimpleDateFormat LONG_DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
 	public static final DecimalFormat MONEY_FORMAT = new DecimalFormat("#,###.00");
 	public static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("#.###");
 	public static final DecimalFormat NUMBER_FORMAT = new DecimalFormat("#.0000");
+	public static final List<OptionExpire> OPTION_EXPIRES = Collections.unmodifiableList(Arrays.asList(
+			new OptionExpire(0, 'A', 'M'),
+			new OptionExpire(1, 'B', 'N'),
+			new OptionExpire(2, 'C', 'O'),
+			new OptionExpire(3, 'D', 'P'),
+			new OptionExpire(4, 'E', 'Q'),
+			new OptionExpire(5, 'F', 'R'),
+			new OptionExpire(6, 'G', 'S'),
+			new OptionExpire(7, 'H', 'T'),
+			new OptionExpire(8, 'I', 'U'),
+			new OptionExpire(9, 'J', 'V'),
+			new OptionExpire(10, 'K', 'W'),
+			new OptionExpire(11, 'L', 'X') ));
 	
 	public static final double DECIMALS = 4;
 	private static final double FACTOR = Math.pow(10, DECIMALS);
@@ -129,5 +146,17 @@ public class DUtils {
 			if(i > v) v = i;
 		}
 		return v;
+	}
+	
+	public static class OptionExpire{
+		public final int month;
+		public final char callLetter;
+		public final char putLetter;
+		
+		public OptionExpire(int month, char callLetter, char putLetter) {
+			this.month = month;
+			this.callLetter = callLetter;
+			this.putLetter = putLetter;
+		}
 	}
 }

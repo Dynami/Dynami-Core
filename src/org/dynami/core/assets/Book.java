@@ -15,7 +15,10 @@
  */
 package org.dynami.core.assets;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.function.BiConsumer;
 
 import org.dynami.core.bus.IMsg;
 
@@ -25,12 +28,18 @@ public class Book {
 	private transient final AtomicReferenceArray<Book.Orders> askSide = new AtomicReferenceArray<>(BOOK_DEEP);
 	private transient final AtomicReferenceArray<Book.Orders> bidSide = new AtomicReferenceArray<>(BOOK_DEEP);
 	
+	private final List<BiConsumer<Book.Orders, Book.Orders>> listeners = new ArrayList<>();
+	protected void addBookListener(BiConsumer<Book.Orders, Book.Orders> listener){
+		listeners.add(listener);
+	}
+	
 	public final IMsg.Handler askBookOrdersHandler = new IMsg.Handler() {
 		@Override
 		public void update(boolean last, Object msg) {
 			if(last && msg instanceof Orders){
 				Orders item = (Orders)msg;
 				askSide.set(item.level-1, item);
+				listeners.forEach(f->f.accept(ask(), bid()));
 			}
 		}
 	};
@@ -41,6 +50,7 @@ public class Book {
 			if(last && msg instanceof Orders){
 				Orders item = (Orders)msg;
 				bidSide.set(item.level-1, item);
+				listeners.forEach(f->f.accept(ask(), bid()));
 			}
 		}
 	};

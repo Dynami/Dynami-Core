@@ -18,6 +18,7 @@ package org.dynami.core.services;
 import java.util.Collection;
 
 import org.dynami.core.assets.Asset;
+import org.dynami.core.assets.OptionChain;
 
 public interface IAssetService {
 	public static final String ID = "IAssetService";
@@ -29,4 +30,6 @@ public interface IAssetService {
 	public Collection<Asset> getAll();
 	
 	public Collection<Asset> getRelated(String symbol);
+	
+	public OptionChain getOptionChainFor(String symbol);
 }

@@ -16,15 +16,119 @@
 package org.dynami.core.assets;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.dynami.core.assets.Asset.Option;
 import org.dynami.core.utils.DUtils;
 
 public class OptionChain {
 	private final String parentSymbol;
-	private long frontMonthExpire = Long.MAX_VALUE, farMonthExpire = 0;
-	private final List<OptionRecord> options = new ArrayList<>();
+	private final List<OptionRecord> options = new ArrayList<>(100);
+	private final SortedSet<Long> expirations = new TreeSet<>();
+	
+	public OptionChain(String parentSymbol, Asset.Option... options) {
+		this.parentSymbol = parentSymbol;
+		for(Asset.Option o:options){
+			add(o);
+		}
+	}
+	
+	private OptionRecord[] getByExpire(long expire){
+		return options.stream()
+				.filter(r->r.expire == expire)
+				.sorted((r1, r2)->Long.compare(r1.expire, r2.expire))
+				.toArray(OptionRecord[]::new);
+	}
+	
+	private OptionRecord[] getByStrike(long strike){
+		return options.stream()
+				.filter(r->r.strike == strike)
+				.sorted((r1, r2)->Long.compare(r1.strike, r2.strike))
+				.toArray(OptionRecord[]::new);
+	}
+	
+	public Asset.Option upperStrike(Asset.Option opt){
+		final OptionRecord[] items = getByExpire(opt.expire);
+		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).strike, ((OptionRecord)r1).strike));
+		return (idx >= 0 && idx < items.length-1)?items[idx+1].option:null;
+	}
+	
+	public Asset.Option lowerStrike(Asset.Option opt){
+		final OptionRecord[] items = getByExpire(opt.expire);
+		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).strike, ((OptionRecord)r1).strike));
+		return (idx > 0 && idx < items.length)?items[idx-1].option:null;
+	}
+	
+	public Asset.Option forwardExpiration(Asset.Option opt){
+		final OptionRecord[] items = getByStrike(DUtils.d2l(opt.strike));
+		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).expire, ((OptionRecord)r1).expire));
+		return (idx >= 0 && idx < items.length-1)?items[idx+1].option:null;
+	}
+	
+	public Asset.Option backwardExpiration(Asset.Option opt){
+		final OptionRecord[] items = getByStrike(DUtils.d2l(opt.strike));
+		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).expire, ((OptionRecord)r1).expire));
+		return (idx > 0 && idx < items.length)?items[idx-1].option:null;
+	}
+	
+	public String getParentSymbol() {
+		return parentSymbol;
+	}
+	
+	private void add(Asset.Option opt){
+		options.add(new OptionRecord(opt.expire, DUtils.d2l(opt.strike), opt.type, opt));
+		expirations.add(opt.expire);
+	}
+	
+	public Asset.Option getCall(double price){
+		return getOptionAtPrice(expirations.first(), Asset.Option.Type.CALL, price);
+	}
+	
+	public Asset.Option getPut(double price){
+		return getOptionAtPrice(expirations.first(), Asset.Option.Type.PUT, price);
+	}
+	
+	public Asset.Option getCall(long expire, double price){
+		checkExpirationDate(expire);
+		return getOptionAtPrice(expire, Asset.Option.Type.CALL, price);
+	}	
+	
+	public Asset.Option getPut(long expire, double price){
+		checkExpirationDate(expire);
+		return getOptionAtPrice(expire, Asset.Option.Type.PUT, price);
+	}
+	
+	private Asset.Option getOptionAtPrice(final long expire, final Asset.Option.Type type, final double price){
+		long _price = DUtils.d2l(price);
+		OptionRecord[] subset = options.stream()
+									.filter(o->o.expire == expire)
+									.filter(o->o.type.equals(type))
+									.sorted((o1, o2)-> Long.compare(o1.strike, o2.strike))
+									.toArray(OptionRecord[]::new);
+		
+		OptionRecord upper = subset[subset.length-1], lower = subset[0];
+		
+		for(int i = 0; i < subset.length; i++){
+			if(subset[i].strike <= _price) lower = subset[i];
+			if(subset[subset.length-i-1].strike >= _price) upper = subset[subset.length-i-1];
+		}
+		
+		long upperDistance = upper.strike - _price;
+		long lowerDistance = _price - lower.strike;
+		
+		if(upperDistance < lowerDistance){
+			return upper.option;
+		} else {
+			return lower.option;
+		}
+	}
+	
+	private void checkExpirationDate(long expire){
+		assert expire >= expirations.first() && expire <= expirations.last() : "Expiration date ["+expire+"] - "+DUtils.DATE_FORMAT.format(expire)+" is out of range";
+	}
 	
 	private static class OptionRecord {
 		private final long expire;
@@ -38,67 +142,5 @@ public class OptionChain {
 			this.type = type;
 			this.option = option;
 		}
-	}
-	
-	public OptionChain(String parentSymbol) {
-		this.parentSymbol = parentSymbol;
-	}
-	
-	public String getParentSymbol() {
-		return parentSymbol;
-	}
-	
-	public void add(Asset.Option opt){
-		options.add(new OptionRecord(opt.expire, opt.strike, opt.type, opt));
-		
-		if(frontMonthExpire > opt.expire) frontMonthExpire = opt.expire;
-		if(farMonthExpire < opt.expire) farMonthExpire = opt.expire;
-		
-	}
-	
-	public Asset.Option getCall(long price){
-		return getOptionAtPrice(frontMonthExpire, Asset.Option.Type.CALL, price);
-	}
-	
-	public Asset.Option getPut(long price){
-		return getOptionAtPrice(frontMonthExpire, Asset.Option.Type.PUT, price);
-	}
-	
-	public Asset.Option getCall(long expire, long price){
-		checkExpirationDate(expire);
-		return getOptionAtPrice(expire, Asset.Option.Type.CALL, price);
-	}	
-	
-	public Asset.Option getPut(long expire, long price){
-		checkExpirationDate(expire);
-		return getOptionAtPrice(expire, Asset.Option.Type.PUT, price);
-	}
-	
-	private Asset.Option getOptionAtPrice(final long expire, final Asset.Option.Type type, final long price){
-		OptionRecord[] subset = options.stream()
-									.filter(o->o.expire == expire)
-									.filter(o->o.type.equals(type))
-									.sorted((o1, o2)-> (int)(o1.strike-o2.strike))
-									.toArray(OptionRecord[]::new);
-		
-		OptionRecord upper = subset[subset.length-1], lower = subset[0];
-		
-		for(int i = 0; i < subset.length; i++){
-			if(subset[i].strike <= price) lower = subset[i];
-			if(subset[subset.length-i-1].strike >= price) upper = subset[subset.length-i-1];
-		}
-		
-		long upperDistance = upper.strike - price;
-		long lowerDistance = price - lower.strike;
-		
-		if(upperDistance < lowerDistance){
-			return upper.option;
-		} else {
-			return lower.option;
-		}
-	}
-	
-	private void checkExpirationDate(long expire){
-		assert expire >= frontMonthExpire && expire <= farMonthExpire : "Expiration date ["+expire+"] - "+DUtils.DATE_FORMAT.format(expire)+" is out of range";
 	}
 }
