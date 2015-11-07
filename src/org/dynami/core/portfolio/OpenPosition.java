@@ -15,9 +15,11 @@
  */
 package org.dynami.core.portfolio;
 
+import org.dynami.core.assets.Asset.Family;
 import org.dynami.core.utils.DUtils;
 
 public class OpenPosition {
+	public final Family family;
 	public final String symbol;
 	public final long quantity;
 	public final double entryPrice;
@@ -25,7 +27,8 @@ public class OpenPosition {
 	public final double pointValue;
 	public long currentTime;
 	
-	public OpenPosition(String symbol, long quantity, double entryPrice, long entryTime, double pointValue, long currentTime) {
+	public OpenPosition(Family family, String symbol, long quantity, double entryPrice, long entryTime, double pointValue, long currentTime) {
+		this.family = family;
 		this.symbol = symbol;
 		this.quantity = quantity;
 		this.entryPrice = entryPrice;
@@ -44,7 +47,7 @@ public class OpenPosition {
 
 	@Override
 	public String toString() {
-		return "OpenPosition [symbol=" + symbol + ", quantity=" + quantity + ", entryPrice=" + String.format("%5.2f", entryPrice)
+		return "OpenPosition [family="+family+", symbol=" + symbol + ", quantity=" + quantity + ", entryPrice=" + String.format("%5.2f", entryPrice)
 				+ ", entryTime=" + DUtils.LONG_DATE_FORMAT.format(entryTime) + ", pointValue=" + pointValue + ", currentTime=" + DUtils.LONG_DATE_FORMAT.format(currentTime) + "]";
 	}
 }

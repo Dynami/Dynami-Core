@@ -53,6 +53,8 @@ public interface IPortfolioService {
 
 	public double realized();
 
+	public double unrealized(String symbol);
+	
 	public double unrealized();
 
 	public Collection<ExecutedOrder> executedOrdersLog();

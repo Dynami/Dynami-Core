@@ -15,9 +15,11 @@
  */
 package org.dynami.core.portfolio;
 
+import org.dynami.core.assets.Asset.Family;
 import org.dynami.core.utils.DUtils;
 
 public class ClosedPosition {
+	public final Family family;
 	public final String symbol;
 	public final long quantity;
 	public final double entryPrice;
@@ -27,10 +29,11 @@ public class ClosedPosition {
 	public final double pointValue;
 	
 	public ClosedPosition(OpenPosition o, double exitPrice, long exitTime){
-		this(o.symbol, o.quantity, o.entryPrice, o.entryTime, exitPrice, exitTime, o.pointValue);
+		this(o.family, o.symbol, o.quantity, o.entryPrice, o.entryTime, exitPrice, exitTime, o.pointValue);
 	}
 	
-	public ClosedPosition(String symbol, long quantity, double entryPrice, long entryTime, double exitPrice, long exitTime, double pointValue) {
+	public ClosedPosition(Family family, String symbol, long quantity, double entryPrice, long entryTime, double exitPrice, long exitTime, double pointValue) {
+		this.family = family;
 		this.symbol = symbol;
 		this.quantity = quantity;
 		this.entryPrice = entryPrice;
@@ -51,7 +54,7 @@ public class ClosedPosition {
 
 	@Override
 	public String toString() {
-		return "ClosedPosition [symbol=" + symbol + ", quantity=" +String.format("%3s", quantity) + ", entryPrice=" + String.format("%5.2f", entryPrice)
+		return "ClosedPosition [family="+family+", symbol=" + symbol + ", quantity=" +String.format("%3s", quantity) + ", entryPrice=" + String.format("%5.2f", entryPrice)
 				+ ", entryTime=" + DUtils.LONG_DATE_FORMAT.format(entryTime) + ", exitPrice=" + String.format("%5.2f", exitPrice) + ", exitTime=" + DUtils.LONG_DATE_FORMAT.format(exitTime) + ", pointValue="
 				+ pointValue + "] "+String.format("%5.2f", roi());
 	}
