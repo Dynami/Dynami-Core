@@ -41,6 +41,8 @@ public interface Config {
 	public static enum Type {
 		JavaType,
 		File, 
-		TFCompression;
+		TFCompression,
+		Spinner,
+		Slider;
 	}
 }

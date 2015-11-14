@@ -100,7 +100,17 @@ public class OptionChain {
 		checkExpirationDate(expire);
 		return getOptionAtPrice(expire, Asset.Option.Type.PUT, price);
 	}
-	
+
+	public Asset.Option getCallAtDelta(long expire, double delta){
+		checkExpirationDate(expire);
+		return getOptionAtDelta(expire, Option.Type.CALL, delta);
+	}
+
+	public Asset.Option getPutAtDelta(long expire, double delta){
+		checkExpirationDate(expire);
+		return getOptionAtDelta(expire, Option.Type.PUT, delta);
+	}
+
 	private Asset.Option getOptionAtPrice(final long expire, final Asset.Option.Type type, final double price){
 		long _price = DUtils.d2l(price);
 		OptionRecord[] subset = options.stream()
@@ -125,6 +135,31 @@ public class OptionChain {
 			return lower.option;
 		}
 	}
+
+	private Asset.Option getOptionAtDelta(final long expire, final Asset.Option.Type type, final double delta){
+		long _delta = DUtils.d2l(delta);
+		OptionRecord[] subset = options.stream()
+				.filter(o->o.expire == expire)
+				.filter(o->o.type.equals(type))
+				.sorted((o1, o2)-> Double.compare(o1.option.greeks().delta(), o2.option.greeks().delta()))
+				.toArray(OptionRecord[]::new);
+
+		OptionRecord upper = subset[subset.length-1], lower = subset[0];
+
+		for(int i = 0; i < subset.length; i++){
+			if(subset[i].option.greeks().delta() <= _delta) lower = subset[i];
+			if(subset[subset.length-i-1].option.greeks().delta() >= _delta) upper = subset[subset.length-i-1];
+		}
+
+		double upperDistance = upper.option.greeks().delta() - _delta;
+		double lowerDistance = _delta - lower.option.greeks().delta();
+
+		if(upperDistance < lowerDistance){
+			return upper.option;
+		} else {
+			return lower.option;
+		}
+	}
 	
 	private void checkExpirationDate(long expire){
 		assert expire >= expirations.first() && expire <= expirations.last() : "Expiration date ["+expire+"] - "+DUtils.DATE_FORMAT.format(expire)+" is out of range";
@@ -141,6 +176,10 @@ public class OptionChain {
 			this.strike = strike;
 			this.type = type;
 			this.option = option;
+		}
+
+		public Option getOption() {
+			return option;
 		}
 	}
 }

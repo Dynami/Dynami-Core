@@ -15,6 +15,10 @@
  */
 package org.dynami.core.assets;
 
+import java.util.function.BiFunction;
+
+import org.dynami.core.utils.DUtils;
+
 public abstract class Asset implements Comparable<Asset> {
 	public final Family family;
 	public final String market;
@@ -61,22 +65,32 @@ public abstract class Asset implements Comparable<Asset> {
 	public static abstract class Tradable extends Asset {
 		public final double requiredMargin;
 		public final Book book = new Book();
-		public Tradable(Family family, String symbol, String isin, String name, double pointValue, double tick, String market, final double requiredMargin) {
+		public final BiFunction<Book.Orders, Book.Orders, Double> lastPriceEngine;
+		public Tradable(Family family, String symbol, String isin, String name, double pointValue, double tick, String market, final double requiredMargin, final BiFunction<Book.Orders, Book.Orders, Double> lastPriceEngine) {
 			super(family, symbol, isin, name, pointValue, tick, market);
 			this.requiredMargin = requiredMargin;
+			this.lastPriceEngine = lastPriceEngine;
+		}
+		
+		public double lastPrice(){
+			return lastPriceEngine.apply(book.bid(), book.ask());
+		}
+		
+		public double getValueAt(double price){
+			return price-lastPrice();
 		}
 	}
 	
 	public static class Share extends Tradable {
-		public Share(String symbol, String isin, String name, double pointValue, double tick, double requiredMargin, String market) {
-			super(Family.Equity, symbol, isin, name, pointValue, tick, market, requiredMargin);
+		public Share(String symbol, String isin, String name, double pointValue, double tick, double requiredMargin, String market, final BiFunction<Book.Orders, Book.Orders, Double> lastPriceEngine) {
+			super(Family.Equity, symbol, isin, name, pointValue, tick, market, requiredMargin, lastPriceEngine);
 		}
 	}
 	
 	public static abstract class DerivativeInstr extends Tradable {
 		public final String parentSymbol;
-		public DerivativeInstr(Family family, String symbol, String isin, String name, double pointValue, double tick, String market, double requiredMargin, String parentSymbol) {
-			super(family, symbol, isin, name, pointValue, tick, market, requiredMargin);
+		public DerivativeInstr(Family family, String symbol, String isin, String name, double pointValue, double tick, String market, double requiredMargin, final BiFunction<Book.Orders, Book.Orders, Double> lastPriceEngine, String parentSymbol) {
+			super(family, symbol, isin, name, pointValue, tick, market, requiredMargin, lastPriceEngine);
 			this.parentSymbol = parentSymbol;
 		}
 	}
@@ -86,39 +100,53 @@ public abstract class Asset implements Comparable<Asset> {
 		public final long lotSize;
 		public final RiskFreeRate riskFreeRate;
 		
-		public ExpiringInstr(Family family, String symbol, String isin, String name, double pointValue, double tick, String market, double requiredMargin, long expire, long lotSize, String parentSymbol, RiskFreeRate riskFreeRate) {
-			super(family, symbol, isin, name, pointValue, tick, market, requiredMargin, parentSymbol);
+		public ExpiringInstr(Family family, String symbol, String isin, String name, double pointValue, double tick, String market, double requiredMargin, final BiFunction<Book.Orders, Book.Orders, Double> lastPriceEngine, long expire, long lotSize, String parentSymbol, RiskFreeRate riskFreeRate) {
+			super(family, symbol, isin, name, pointValue, tick, market, requiredMargin, lastPriceEngine, parentSymbol);
 			this.expire = expire;
 			this.lotSize = lotSize;
 			this.riskFreeRate = riskFreeRate;
+		}
+		
+		public boolean isExpired(long date){
+			return expire > date;
+		}
+		
+		public int daysToExpiration(long date){
+			return (int)((expire-date)/DUtils.DAY_MILLIS);
 		}
 	}
 	
 	public static class Option extends ExpiringInstr {
 		public final double strike;
 		public final Type type;
-		public final Greeks greeks;
+		public final Greeks greeks = new Greeks();
+		public final Exercise exercise;
 		public final Greeks.Engine greeksEngine;
 		public final Greeks.ImpliedVolatility implVola;
-		private double impliedVolatility;
+		private double volatility;
 		public static enum Type { CALL, PUT }
+		public static enum Exercise {European, American}
 		
-		public Option(String symbol, String isin, String name, double pointValue, double tick, double requiredMargin,  
+		public Option(String symbol, String isin, String name, double pointValue, double tick, 
+				double requiredMargin, 
+				final BiFunction<Book.Orders, Book.Orders, Double> lastPriceEngine,  
 				String market, long expire, long lotSize, String parentSymbol, RiskFreeRate riskFreeRate, 
-				double strike, Type type,  Greeks.Engine greeksEngine, Greeks.ImpliedVolatility implVola){
-			super(Family.Option, symbol, isin, name, pointValue, tick, market, requiredMargin, expire, lotSize, parentSymbol, riskFreeRate);
+				double strike, Type type,  Exercise exercise, 
+				Greeks.Engine greeksEngine, 
+				Greeks.ImpliedVolatility implVola){
+			super(Family.Option, symbol, isin, name, pointValue, tick, market, requiredMargin, lastPriceEngine, expire, lotSize, parentSymbol, riskFreeRate);
 			this.strike = strike;
 			this.type = type;
-			this.greeks = new Greeks();
 			this.greeksEngine = greeksEngine;
 			this.implVola = implVola;
+			this.exercise = exercise;
 			
 			book.addBookListener((ask, bid)->{
 				double rf = riskFreeRate.get();
-				double optionMidPrice = (ask.price+bid.price)/2.;
+				double optionMidPrice = lastPriceEngine.apply(bid, ask);
 				long time = Math.max(ask.time, bid.time);
-				impliedVolatility = implVola.estimate(parentSymbol,  time, type, expire, strike, optionMidPrice, rf);
-				greeksEngine.evaluate(greeks, time, type, expire, strike, optionMidPrice, impliedVolatility, rf);
+				volatility = implVola.estimate(parentSymbol,  time, type, expire, strike, optionMidPrice, rf);
+				greeksEngine.evaluate(greeks, time, type, expire, strike, optionMidPrice, volatility, rf);
 			});
 		}
 		
@@ -133,15 +161,28 @@ public abstract class Asset implements Comparable<Asset> {
 		public Type getType() {
 			return type;
 		}
-		public double getImpliedVolatility() {
-			return impliedVolatility;
+		public double getVolatility() {
+			return volatility;
 		}
 		
+		public Exercise getExercise(){
+			return exercise;
+		}
+		
+		public double getValueAt(double price, long date){
+			if(date > expire){
+				return 0.;
+			} else {
+				return price-lastPrice();
+			}
+		}
 	}
 	
 	public static class Future extends ExpiringInstr {
-		public Future(String symbol, String isin, String name, double pointValue, double tick, double requiredMargin, String market, long expire, long lotSize, String parentSymbol, RiskFreeRate riskFreeRate) {
-			super(Family.Future, symbol, isin, name, pointValue, tick, market, requiredMargin, expire, lotSize, parentSymbol, riskFreeRate);
+		public Future(String symbol, String isin, String name, double pointValue, double tick, double requiredMargin,
+				final BiFunction<Book.Orders, Book.Orders, Double> lastPriceEngine,
+				String market, long expire, long lotSize, String parentSymbol, RiskFreeRate riskFreeRate) {
+			super(Family.Future, symbol, isin, name, pointValue, tick, market, requiredMargin, lastPriceEngine, expire, lotSize, parentSymbol, riskFreeRate);
 		}
 	}
 	
