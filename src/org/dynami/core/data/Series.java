@@ -18,7 +18,7 @@ package org.dynami.core.data;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 
-public class Series implements Cloneable {
+public class Series implements Cloneable, Iterable<Double> {
 	private static final int BUFFER_SIZE = 1024;
 	private double[] data;
 	private int cursor;
@@ -230,6 +230,10 @@ public class Series implements Cloneable {
 		double[] out = new double[cursor];
 		System.arraycopy(data, 0, out, 0, cursor);
 		return out;
+	}
+	
+	public Series subset(int start, int end){
+		return new Series(toArray(start, end));
 	}
 	
 	public double[] toArray(final int start, final int end){

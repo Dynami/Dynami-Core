@@ -57,4 +57,5 @@ public interface IDataService {
 	 * @return {@link IData}
 	 */
 	public IData history(String symbol, Date from, Date to, long timeFrame, int units);
+	
 }

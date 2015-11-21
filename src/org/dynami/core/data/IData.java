@@ -48,6 +48,8 @@ public interface IData {
 
 	public IData getPeriod(long begin, long end);
 	
+	public IData getLastBars(int number);
+	
 	/**
 	 * @see {@link COMPRESSION_UNIT}
 	 * @return
@@ -55,6 +57,11 @@ public interface IData {
 	public long getCompression();
 	
 	public IData changeCompression(long compression);
+	
+	
+	public default double getVolatility(IVolatilityEngine engine, int period){
+		return engine.compute(this, period);
+	}
 	
 	public static class COMPRESSION_UNIT {
 		public static final long TICK = 0L;

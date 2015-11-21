@@ -34,15 +34,15 @@ public interface Config {
 	public static @interface Param {
 		String name() default "";
 		String description() default "";
+		double min() default 0;
+		double max() default Double.MAX_VALUE;
+		double step() default 0.1;
 		boolean observable() default false;
 		Type type() default Type.JavaType;
 	}
 	
 	public static enum Type {
-		JavaType,
-		File, 
-		TFCompression,
-		Spinner,
-		Slider;
+		JavaType
+		;
 	}
 }
