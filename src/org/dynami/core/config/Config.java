@@ -39,6 +39,7 @@ public interface Config {
 		double step() default 0.1;
 		boolean observable() default false;
 		Type type() default Type.JavaType;
+		Class<?>[] values() default {};
 	}
 	
 	public static enum Type {

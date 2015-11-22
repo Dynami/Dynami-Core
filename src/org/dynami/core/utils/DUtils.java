@@ -18,8 +18,11 @@ package org.dynami.core.utils;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+
+import org.dynami.core.assets.Asset.Option;
 
 public class DUtils {
 	public static final long DAY_MILLIS = 24*60*60*1000L;
@@ -42,6 +45,31 @@ public class DUtils {
 			new OptionExpire(9, 'J', 'V'),
 			new OptionExpire(10, 'K', 'W'),
 			new OptionExpire(11, 'L', 'X') ));
+	
+	public static String getOptionName(String prefix, Option.Type type,long expire, double strike){
+		StringBuilder builder = new StringBuilder(prefix);
+		builder.append(" ");
+		builder.append(type.name());
+		builder.append(" ");
+		builder.append(MONEY_FORMAT.format(strike));
+		builder.append(" ");
+		builder.append(DATE_FORMAT.format(expire));
+		return builder.toString();
+	}
+	
+	public static String getOptionSymbol(String prefix, Option.Type type,long expire, double strike){
+		StringBuilder builder = new StringBuilder(prefix);
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(expire);
+		OptionExpire exp = OPTION_EXPIRES.stream()
+				.filter(o->o.month==cal.get(Calendar.MONTH))
+				.findFirst().get();
+		if(exp != null){
+			builder.append(Option.Type.CALL.equals(type)?exp.callLetter:exp.putLetter);
+		}
+		builder.append(String.format("%6.0f", strike));
+		return builder.toString();
+	}
 	
 	public static final double DECIMALS = 4;
 	private static final double FACTOR = Math.pow(10, DECIMALS);
