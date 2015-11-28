@@ -15,30 +15,30 @@
  */
 package org.dynami.core.portfolio;
 
-import org.dynami.core.assets.Asset.Family;
+import org.dynami.core.assets.Asset;
 import org.dynami.core.utils.DUtils;
 
 public class OpenPosition {
-	public final Family family;
-	public final String symbol;
+	public final Asset.Tradable asset;
 	public final long quantity;
 	public final double entryPrice;
 	public final long entryTime;
-	public final double pointValue;
 	public long currentTime;
 	
-	public OpenPosition(Family family, String symbol, long quantity, double entryPrice, long entryTime, double pointValue, long currentTime) {
-		this.family = family;
-		this.symbol = symbol;
+	public OpenPosition(Asset.Tradable asset, long quantity, double entryPrice, long entryTime, long currentTime) {
+		this.asset = asset;
 		this.quantity = quantity;
 		this.entryPrice = entryPrice;
 		this.entryTime = entryTime;
-		this.pointValue = pointValue;
 		this.currentTime = currentTime;
 	}
 	
 	public void setCurrentTime(long currentTime) {
 		this.currentTime = currentTime;
+	}
+	
+	public double getCurrentPrice(){
+		return (quantity > 0)?asset.book.bid().price:asset.book.ask().price;
 	}
 	
 	public long getCurrentTime() {
@@ -47,7 +47,7 @@ public class OpenPosition {
 
 	@Override
 	public String toString() {
-		return "OpenPosition [family="+family+", symbol=" + symbol + ", quantity=" + quantity + ", entryPrice=" + String.format("%5.2f", entryPrice)
-				+ ", entryTime=" + DUtils.LONG_DATE_FORMAT.format(entryTime) + ", pointValue=" + pointValue + ", currentTime=" + DUtils.LONG_DATE_FORMAT.format(currentTime) + "]";
+		return "OpenPosition [family="+asset.family+", symbol=" + asset.symbol + ", quantity=" + quantity + ", entryPrice=" + String.format("%5.2f", entryPrice)
+				+ ", entryTime=" + DUtils.LONG_DATE_FORMAT.format(entryTime) + ", pointValue=" + asset.pointValue + ", currentTime=" + DUtils.LONG_DATE_FORMAT.format(currentTime) + "]";
 	}
 }

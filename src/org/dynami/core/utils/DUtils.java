@@ -26,12 +26,14 @@ import org.dynami.core.assets.Asset.Option;
 
 public class DUtils {
 	public static final long DAY_MILLIS = 24*60*60*1000L;
+	public static final long YEAR_WORKDAYS = 252;
+	public static final long YEAR_DAYS = 365;
 	
 	public static final SimpleDateFormat LONG_DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
 	public static final DecimalFormat MONEY_FORMAT = new DecimalFormat("#,###.00");
 	public static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("#.###");
-	public static final DecimalFormat NUMBER_FORMAT = new DecimalFormat("#.0000");
+	public static final DecimalFormat NUMBER_FORMAT = new DecimalFormat("#0.000");
 	public static final List<OptionExpire> OPTION_EXPIRES = Collections.unmodifiableList(Arrays.asList(
 			new OptionExpire(0, 'A', 'M'),
 			new OptionExpire(1, 'B', 'N'),
@@ -59,6 +61,18 @@ public class DUtils {
 	
 	public static String getOptionSymbol(String prefix, Option.Type type,long expire, double strike){
 		StringBuilder builder = new StringBuilder(prefix);
+		builder.append(Option.Type.CALL.equals(type)?"C":"P" );
+		builder.append(String.format("%5.0f", strike));
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(expire);
+		builder.append(cal.get(Calendar.YEAR));
+		int month = cal.get(Calendar.MONTH)+1;
+		builder.append(month<10?"0"+month:month);
+		return builder.toString();
+	}
+	
+	public static String getOptionSymbol_(String prefix, Option.Type type,long expire, double strike){
+		StringBuilder builder = new StringBuilder(prefix);
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(expire);
 		OptionExpire exp = OPTION_EXPIRES.stream()
@@ -67,7 +81,7 @@ public class DUtils {
 		if(exp != null){
 			builder.append(Option.Type.CALL.equals(type)?exp.callLetter:exp.putLetter);
 		}
-		builder.append(String.format("%6.0f", strike));
+		builder.append(String.format("%5.0f", strike));
 		return builder.toString();
 	}
 	
@@ -186,5 +200,13 @@ public class DUtils {
 			this.callLetter = callLetter;
 			this.putLetter = putLetter;
 		}
+	}
+	
+	/**
+	 * //p = c – S + Xe – r(T-t)
+	 * @return
+	 */
+	public static double putPrice(double callPrice, double spotPrice, double strike, double maturity, double riskFreeRate){
+		return callPrice-spotPrice+strike-Math.exp(-riskFreeRate*maturity);
 	}
 }

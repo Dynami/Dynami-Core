@@ -15,19 +15,21 @@
  */
 package org.dynami.core.assets;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.dynami.core.assets.Asset.Option;
+import org.dynami.core.utils.DTime;
 import org.dynami.core.utils.DUtils;
 
 public class OptionChain {
 	private final String parentSymbol;
-	private final List<OptionRecord> options = new ArrayList<>(100);
-	private final SortedSet<Long> expirations = new TreeSet<>();
+	private final List<OptionRecord> options = new CopyOnWriteArrayList<>();
+	private final SortedSet<Long> expirations = new ConcurrentSkipListSet<>();
 
 	public OptionChain(String parentSymbol, Asset.Option... options) {
 		this.parentSymbol = parentSymbol;
@@ -35,41 +37,75 @@ public class OptionChain {
 			add(o);
 		}
 	}
+	
+	public long frontExpiration(){
+		return expirations.first();
+	}
+	
+	public long farExpiration(){
+		return expirations.last();
+	}
+	
+	public int cleanExpired(){
+		AtomicInteger removed = new AtomicInteger(0);
+		for(OptionRecord or:options){
+			if(or.expire < DTime.Clock.getTime()){
+				options.remove(or);
+				removed.incrementAndGet();
+			}
+		}
+		for(Long e:expirations){
+			if(e < DTime.Clock.getTime()){
+				expirations.remove(e);
+			}
+		}
+		return removed.get();
+	}
 
-	private OptionRecord[] getByExpire(long expire){
+	private OptionRecord[] getByExpire(long expire, Option.Type type){
 		return options.stream()
 				.filter(r->r.expire == expire)
+				.filter(r->r.type.equals(type))
 				.sorted((r1, r2)->Long.compare(r1.expire, r2.expire))
 				.toArray(OptionRecord[]::new);
 	}
 
-	private OptionRecord[] getByStrike(long strike){
+	private OptionRecord[] getByStrike(long strike, Option.Type type){
 		return options.stream()
 				.filter(r->r.strike == strike)
+				.filter(r->r.type.equals(type))
 				.sorted((r1, r2)->Long.compare(r1.strike, r2.strike))
 				.toArray(OptionRecord[]::new);
 	}
+	
+	public Asset.Option upperStrike(Asset.Option opt, int numberOfStrikes){
+		final OptionRecord[] items = getByExpire(opt.expire, opt.type);
+		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).strike, ((OptionRecord)r1).strike));
+		return (idx >= 0 && idx+numberOfStrikes < items.length)?items[idx+numberOfStrikes].option:null;
+	}
+	
+	public Asset.Option lowerStrike(Asset.Option opt, int numberOfStrikes){
+		final OptionRecord[] items = getByExpire(opt.expire, opt.type);
+		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).strike, ((OptionRecord)r1).strike));
+		return (idx-numberOfStrikes >= 0 && idx-numberOfStrikes < items.length)?items[idx-numberOfStrikes].option:null;
+	}
 
 	public Asset.Option upperStrike(Asset.Option opt){
-		final OptionRecord[] items = getByExpire(opt.expire);
-		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).strike, ((OptionRecord)r1).strike));
-		return (idx >= 0 && idx < items.length-1)?items[idx+1].option:null;
+		return upperStrike(opt, 1);
 	}
 
 	public Asset.Option lowerStrike(Asset.Option opt){
-		final OptionRecord[] items = getByExpire(opt.expire);
-		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).strike, ((OptionRecord)r1).strike));
-		return (idx > 0 && idx < items.length)?items[idx-1].option:null;
+		return lowerStrike(opt, 1);
 	}
 
 	public Asset.Option forwardExpiration(Asset.Option opt){
-		final OptionRecord[] items = getByStrike(DUtils.d2l(opt.strike));
+		final OptionRecord[] items = getByStrike(DUtils.d2l(opt.strike), opt.type);
 		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).expire, ((OptionRecord)r1).expire));
 		return (idx >= 0 && idx < items.length-1)?items[idx+1].option:null;
 	}
 
 	public Asset.Option backwardExpiration(Asset.Option opt){
-		final OptionRecord[] items = getByStrike(DUtils.d2l(opt.strike));
+		final OptionRecord[] items = getByStrike(DUtils.d2l(opt.strike), opt.type);
 		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).expire, ((OptionRecord)r1).expire));
 		return (idx > 0 && idx < items.length)?items[idx-1].option:null;
 	}
@@ -184,9 +220,8 @@ public class OptionChain {
 			this.type = type;
 			this.option = option;
 		}
-
-		public Option getOption() {
-			return option;
-		}
+//		public Option getOption() {
+//			return option;
+//		}
 	}
 }

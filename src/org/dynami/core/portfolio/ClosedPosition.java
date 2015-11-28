@@ -29,7 +29,7 @@ public class ClosedPosition {
 	public final double pointValue;
 	
 	public ClosedPosition(OpenPosition o, double exitPrice, long exitTime){
-		this(o.family, o.symbol, o.quantity, o.entryPrice, o.entryTime, exitPrice, exitTime, o.pointValue);
+		this(o.asset.family, o.asset.symbol, o.quantity, o.entryPrice, o.entryTime, exitPrice, exitTime, o.asset.pointValue);
 	}
 	
 	public ClosedPosition(Family family, String symbol, long quantity, double entryPrice, long entryTime, double exitPrice, long exitTime, double pointValue) {

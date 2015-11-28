@@ -46,7 +46,7 @@ public class Greeks {
 
 	@FunctionalInterface
 	public static interface Engine {
-		public void evaluate(Greeks output, long time, Asset.Option.Type type, long expire, double strike, double price, double vola, double interestRate);
+		public void evaluate(Greeks output, String underlyingSymbol, long time, Asset.Option.Type type, long expire, double strike, double price, double vola, double interestRate);
 	}
 	
 	@FunctionalInterface
