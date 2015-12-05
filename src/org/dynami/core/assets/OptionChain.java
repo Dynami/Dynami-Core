@@ -15,7 +15,6 @@
  */
 package org.dynami.core.assets;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -39,11 +38,17 @@ public class OptionChain {
 	}
 	
 	public long frontExpiration(){
-		return expirations.first();
+		if(expirations.size()>0)
+			return expirations.first();
+		else
+			return 0;
 	}
 	
 	public long farExpiration(){
-		return expirations.last();
+		if(expirations.size()>0)
+			return expirations.last();
+		else
+			return 0;
 	}
 	
 	public int cleanExpired(){
@@ -78,15 +83,55 @@ public class OptionChain {
 				.toArray(OptionRecord[]::new);
 	}
 	
+	private int searchIndexByExpire(OptionRecord[] items, long expire){
+		int idx = -1;
+		int from=0, to=items.length-1;
+		do{
+			if(items[from+(to-from)/2].expire == expire){
+				idx =  from+(to-from)/2;
+				break;
+			} else if(from == to && items[to].expire != expire){
+				break;
+			}
+			
+			if(items[from+(to-from)/2].expire <= expire){
+				from += (to-from)/2+(((to-from)%2==1)?1:0);
+			} else {
+				to -= (to-from)/2;
+			}
+		} while(true);
+		return idx;
+	}
+	
+	private int searchIndexByStrike(OptionRecord[] items, long strike){
+		int idx = -1;
+		int from=0, to=items.length-1;
+		do{
+			if(items[from+(to-from)/2].strike == strike){
+				idx =  from+(to-from)/2;
+				break;
+			} else if(from == to && items[to].strike != strike){
+				break;
+			}
+			
+			if(items[from+(to-from)/2].strike <= strike){
+				from += (to-from)/2+(((to-from)%2==1)?1:0);
+			} else {
+				to -= (to-from)/2;
+			}
+		} while(true);
+		return idx;
+	}
+	
 	public Asset.Option upperStrike(Asset.Option opt, int numberOfStrikes){
 		final OptionRecord[] items = getByExpire(opt.expire, opt.type);
-		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).strike, ((OptionRecord)r1).strike));
+		final int idx = searchIndexByStrike(items, DUtils.d2l(opt.strike));
 		return (idx >= 0 && idx+numberOfStrikes < items.length)?items[idx+numberOfStrikes].option:null;
 	}
 	
 	public Asset.Option lowerStrike(Asset.Option opt, int numberOfStrikes){
 		final OptionRecord[] items = getByExpire(opt.expire, opt.type);
-		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).strike, ((OptionRecord)r1).strike));
+		final int idx = searchIndexByStrike(items, DUtils.d2l(opt.strike));
 		return (idx-numberOfStrikes >= 0 && idx-numberOfStrikes < items.length)?items[idx-numberOfStrikes].option:null;
 	}
 
@@ -100,13 +145,13 @@ public class OptionChain {
 
 	public Asset.Option forwardExpiration(Asset.Option opt){
 		final OptionRecord[] items = getByStrike(DUtils.d2l(opt.strike), opt.type);
-		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).expire, ((OptionRecord)r1).expire));
+		final int idx = searchIndexByExpire(items, opt.expire);
 		return (idx >= 0 && idx < items.length-1)?items[idx+1].option:null;
 	}
 
 	public Asset.Option backwardExpiration(Asset.Option opt){
 		final OptionRecord[] items = getByStrike(DUtils.d2l(opt.strike), opt.type);
-		final int idx = Arrays.binarySearch(items, opt, (r1, r2)->Long.compare(((OptionRecord)r1).expire, ((OptionRecord)r1).expire));
+		final int idx = searchIndexByExpire(items, opt.expire);
 		return (idx > 0 && idx < items.length)?items[idx-1].option:null;
 	}
 
@@ -180,7 +225,6 @@ public class OptionChain {
 	}
 
 	private Asset.Option getOptionAtDelta(final long expire, final Asset.Option.Type type, final double delta){
-		long _delta = DUtils.d2l(delta);
 		OptionRecord[] subset = options.stream()
 				.filter(o->o.expire == expire)
 				.filter(o->o.type.equals(type))
@@ -190,12 +234,12 @@ public class OptionChain {
 		OptionRecord upper = subset[subset.length-1], lower = subset[0];
 
 		for(int i = 0; i < subset.length; i++){
-			if(subset[i].option.greeks().delta() <= _delta) lower = subset[i];
-			if(subset[subset.length-i-1].option.greeks().delta() >= _delta) upper = subset[subset.length-i-1];
+			if(subset[i].option.greeks().delta() <= delta) lower = subset[i];
+			if(subset[subset.length-i-1].option.greeks().delta() >= delta) upper = subset[subset.length-i-1];
 		}
 
-		double upperDistance = upper.option.greeks().delta() - _delta;
-		double lowerDistance = _delta - lower.option.greeks().delta();
+		double upperDistance = upper.option.greeks().delta() - delta;
+		double lowerDistance = delta - lower.option.greeks().delta();
 
 		if(upperDistance < lowerDistance){
 			return upper.option;

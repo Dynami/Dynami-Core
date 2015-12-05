@@ -15,8 +15,8 @@
  */
 package org.dynami.core.data;
 
-@FunctionalInterface
-public interface IVolatilityEngine {	
-	public double compute(IData data, int period);
-	
+import org.dynami.core.assets.Asset;
+
+public interface IPricingEngine {
+	public double compute(Asset.Tradable tradable, long time, double price, double vola, double riskfreeRate);
 }

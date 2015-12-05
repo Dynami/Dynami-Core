@@ -21,15 +21,16 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.dynami.core.assets.Asset.Option.Type;
 
 public class Greeks {
-	private double delta, gamma, vega, theta, rho;
+	private double delta, gamma, vega, theta, rho, theoreticalPrice;
 	
 	public double delta() {return delta;}
 	public double gamma() {return gamma;}
 	public double vega() {return vega;}
 	public double theta() {return theta;}
 	public double rho() {return rho;}
+	public double theoreticalPrice() {return theoreticalPrice;}
 	
-	public void setGreeks(double delta, double gamma, double vega, double theta, double rho){
+	public void setGreeks(double delta, double gamma, double vega, double theta, double rho, double theoreticalPrice){
 		Lock lock = new ReentrantLock();
 		if(lock.tryLock()){
 			try {
@@ -38,6 +39,7 @@ public class Greeks {
 				this.vega = vega;
 				this.theta= theta;
 				this.rho = rho;
+				this.theoreticalPrice = theoreticalPrice;
 			} finally {
 				lock.unlock();
 			}
@@ -46,7 +48,7 @@ public class Greeks {
 
 	@FunctionalInterface
 	public static interface Engine {
-		public void evaluate(Greeks output, String underlyingSymbol, long time, Asset.Option.Type type, long expire, double strike, double price, double vola, double interestRate);
+		public void evaluate(Greeks output, String underlyingSymbol, long time, Asset.Option.Type type, long expire, double strike, double vola, double riskFreeRate);
 	}
 	
 	@FunctionalInterface

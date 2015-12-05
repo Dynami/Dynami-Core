@@ -17,6 +17,7 @@ package org.dynami.core.assets;
 
 import java.util.function.BiFunction;
 
+import org.dynami.core.data.IPricingEngine;
 import org.dynami.core.utils.DUtils;
 
 public abstract class Asset implements Comparable<Asset> {
@@ -44,6 +45,10 @@ public abstract class Asset implements Comparable<Asset> {
 			return (Asset.Tradable)this;
 		else
 			return null;
+	}
+	
+	public boolean is(Family family){
+		return this.family.equals(family);
 	}
 	
 	private Asset(Family family, String symbol, String isin, String name, double pointValue, double tick, Market market){
@@ -76,8 +81,8 @@ public abstract class Asset implements Comparable<Asset> {
 			return lastPriceEngine.apply(book.bid(), book.ask());
 		}
 		
-		public double getValueAt(double price){
-			return price-lastPrice();
+		public double getValueAt(double price, long time, IPricingEngine pricingEngine){
+			return price;
 		}
 	}
 	
@@ -95,7 +100,7 @@ public abstract class Asset implements Comparable<Asset> {
 		}
 	}
 	
-	private static abstract class ExpiringInstr extends DerivativeInstr {
+	public static abstract class ExpiringInstr extends DerivativeInstr {
 		public final long expire;
 		public final long lotSize;
 		public final RiskFreeRate riskFreeRate;
@@ -146,8 +151,8 @@ public abstract class Asset implements Comparable<Asset> {
 					double rf = riskFreeRate.get();
 					double optionMidPrice = lastPriceEngine.apply(bid, ask);
 					long time = Math.max(ask.time, bid.time);
-					volatility = implVola.estimate(parentSymbol,  time, type, expire, strike, optionMidPrice, rf);
-					greeksEngine.evaluate(greeks, parentSymbol, time, type, expire, strike, optionMidPrice, volatility, rf);
+					volatility = implVola.estimate(parentSymbol, time, type, expire, strike, optionMidPrice, rf);
+					greeksEngine.evaluate(greeks, parentSymbol, time, type, expire, strike,  volatility, rf);
 				}
 			});
 		}
@@ -166,16 +171,29 @@ public abstract class Asset implements Comparable<Asset> {
 		public double getVolatility() {
 			return volatility;
 		}
+		// FIXME - TO REMOVE!!!!
+//		public void setVolatility(double vola) {
+//			volatility = vola; 
+//		}
 		
 		public Exercise getExercise(){
 			return exercise;
 		}
 		
-		public double getValueAt(double price, long date){
-			if(date > expire){
+		public double getValueAtExpiration(double price){
+			if(Type.CALL.equals(type)){
+				return Math.max(price-strike, 0);
+			} else {
+				return Math.max(strike-price, 0);
+			}
+		}
+		
+		@Override
+		public double getValueAt(double price, long time, IPricingEngine pricingEngine){
+			if(time > expire){
 				return 0.;
 			} else {
-				return price-lastPrice();
+				return pricingEngine.compute(this, time, price, getVolatility(), riskFreeRate.get());
 			}
 		}
 	}
