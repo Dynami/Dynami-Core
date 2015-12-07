@@ -63,12 +63,62 @@ public interface IData {
 		return engine.compute(this, period);
 	}
 	
-	public static class COMPRESSION_UNIT {
-		public static final long TICK = 0L;
-		public static final long SECOND = 1000L;
-		public static final long MINUTE = 60*SECOND;
-		public static final long HOUR = 60*MINUTE;
-		public static final long DAY = 24*HOUR;
-		public static final long WEEK = 7*DAY;
+	public static enum TimeUnit {
+		Tick(0),
+		Second(1_000L),
+		Minute(Second.tu*60),
+		Hour(Minute.tu*60),
+		Day(Hour.tu*24),
+		Week(Day.tu*7);
+		
+		final long tu;
+		TimeUnit(long compression) {
+			this.tu = compression;
+		}
+		
+		public long millis(){
+			return this.tu;
+		}
+		
+		public static TimeUnit getTimeUnit(long compression){
+			if(compression >= TimeUnit.Week.millis()){
+				return TimeUnit.Week;
+			} else if(compression >= TimeUnit.Day.millis()){
+				return TimeUnit.Day;
+			} else if(compression >= TimeUnit.Hour.millis()){
+				return TimeUnit.Hour;
+			} else if(compression >= TimeUnit.Minute.millis()){
+				return TimeUnit.Minute;
+			} else if(compression >= TimeUnit.Second.millis()){
+				return TimeUnit.Second;
+			} else {
+				return TimeUnit.Tick;
+			}
+		}
+		
+		public static long getUnits(long compression){
+			if(compression >= TimeUnit.Week.millis()){
+				return compression/TimeUnit.Week.millis();
+			} else if(compression >= TimeUnit.Day.millis()){
+				return compression/TimeUnit.Day.millis();
+			} else if(compression >= TimeUnit.Hour.millis()){
+				return compression/TimeUnit.Hour.millis();
+			} else if(compression >= TimeUnit.Minute.millis()){
+				return compression/TimeUnit.Minute.millis();
+			} else if(compression >= TimeUnit.Second.millis()){
+				return compression/TimeUnit.Second.millis();
+			} else {
+				return 0L;
+			}
+		}
 	}
+	
+//	public static class COMPRESSION_UNIT {
+//		public static final long TICK = 0L;
+//		public static final long SECOND = 1000L;
+//		public static final long MINUTE = 60*SECOND;
+//		public static final long HOUR = 60*MINUTE;
+//		public static final long DAY = 24*HOUR;
+//		public static final long WEEK = 7*DAY;
+//	}
 }

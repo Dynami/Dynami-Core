@@ -43,7 +43,7 @@ public interface Config {
 	}
 	
 	public static enum Type {
-		JavaType
+		JavaType, TimeFrame
 		;
 	}
 }
