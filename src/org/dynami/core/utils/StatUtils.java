@@ -33,10 +33,10 @@ public class StatUtils {
 	public static double std(Series series){
 		double avg = avg(series);
 		double sum = 0;
-		for(Double d: series){
+		for(double d: series){
 			sum += Math.pow(d-avg, 2);
 		}
-		return Math.sqrt(sum/series.size()-1);
+		return Math.sqrt(sum/(series.size()-1.));
 	}
 	
 	public static double relativeStd(Series series){

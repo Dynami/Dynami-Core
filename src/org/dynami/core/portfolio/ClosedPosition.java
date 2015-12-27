@@ -48,7 +48,7 @@ public class ClosedPosition {
 	}
 	
 	public double percRoi(){
-		return Math.log(exitPrice/entryPrice)*((quantity>0)?1:-1);
+		return ((exitPrice-entryPrice)/entryPrice)*((quantity>0)?1:-1);
 	}
 	
 
