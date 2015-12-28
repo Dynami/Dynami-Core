@@ -18,34 +18,26 @@ package org.dynami.core.data.vola;
 import org.dynami.core.data.Bar;
 import org.dynami.core.data.IData;
 import org.dynami.core.data.IVolatilityEngine;
-import org.dynami.core.data.Series;
-import org.dynami.core.utils.StatUtils;
 
-public class CloseToCloseVolatilityEngine implements IVolatilityEngine {
-	
+public class RogersSatchellVolatilityEngine implements IVolatilityEngine {
+
 	@Override
-	public double compute(final IData data, final int period) {
+	public double compute(IData data, int period) {
 		int size = data.size();
-		if(size > period){
+		if(size >= period){
 			double r_pow = 0, sigma;
-			Bar bar, bar_1;
-			Series r = new Series();
+			Bar bar;
 			for(int i = size-period; i < size; i++){
 				bar = data.get(i);
-				bar_1 = data.get(i-1);
-				r.append( Math.log(bar.close/bar_1.close));
-			}
-			
-			double avg = StatUtils.avg(r);
-			
-			for(int i = size-period; i < size; i++){
-				bar = data.get(i);
-				bar_1 = data.get(i-1);
-				r_pow += Math.pow(Math.log(bar.close/bar_1.close)-avg, 2);
+				r_pow += Math.log(bar.high/bar.close)*
+						Math.log(bar.high/bar.open)+
+						Math.log(bar.low/bar.close)*
+						Math.log(bar.low/bar.open);
 			}
 			sigma = Math.sqrt(r_pow);
 			return sigma;
 		}
 		return 0;
 	}
+
 }

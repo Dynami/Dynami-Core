@@ -13,35 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.dynami.core.data.vola;
 
 import org.dynami.core.data.Bar;
 import org.dynami.core.data.IData;
 import org.dynami.core.data.IVolatilityEngine;
-import org.dynami.core.data.Series;
-import org.dynami.core.utils.StatUtils;
 
-public class CloseToCloseVolatilityEngine implements IVolatilityEngine {
-	
+public class GarmanKlassYangZhangVolatilityEngine implements IVolatilityEngine {
 	@Override
 	public double compute(final IData data, final int period) {
 		int size = data.size();
 		if(size > period){
 			double r_pow = 0, sigma;
 			Bar bar, bar_1;
-			Series r = new Series();
 			for(int i = size-period; i < size; i++){
 				bar = data.get(i);
 				bar_1 = data.get(i-1);
-				r.append( Math.log(bar.close/bar_1.close));
-			}
-			
-			double avg = StatUtils.avg(r);
-			
-			for(int i = size-period; i < size; i++){
-				bar = data.get(i);
-				bar_1 = data.get(i-1);
-				r_pow += Math.pow(Math.log(bar.close/bar_1.close)-avg, 2);
+				r_pow += Math.pow( Math.log(bar.open/bar_1.close), 2) + 
+						0.5*Math.pow( Math.log(bar.high/bar.low), 2) -
+						(2*Math.log(2.0)-1)*Math.pow( Math.log(bar.close/bar.open), 2);
 			}
 			sigma = Math.sqrt(r_pow);
 			return sigma;

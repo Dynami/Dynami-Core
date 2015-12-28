@@ -13,26 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dynami.core.services;
+package org.dynami.core.data.vola;
 
-import java.util.Collection;
+import org.dynami.core.data.Bar;
+import org.dynami.core.data.IData;
+import org.dynami.core.data.IVolatilityEngine;
 
-import org.dynami.core.assets.Asset;
-import org.dynami.core.assets.Market;
-import org.dynami.core.assets.OptionChain;
-
-public interface IAssetService {
-	public static final String ID = "IAssetService";
-	
-	public Asset getBySymbol(String symbol);
-	
-	public Asset getByIsin(String isin);
-	
-	public Collection<Asset> getAll();
-	
-	public Collection<Asset> getRelated(String symbol);
-	
-	public Market getMarketBySymbol(String symbol);
-	
-	public OptionChain getOptionChainFor(String symbol);
+public class ParkinsonVolatilityEngine implements IVolatilityEngine {
+	@Override
+	public double compute(final IData data, final int period) {
+		int size = data.size();
+		if(size >= period){
+			double r_pow = 0, sigma;
+			Bar bar;
+			for(int i = size-period; i < size; i++){
+				bar = data.get(i);
+				r_pow += Math.pow( Math.log(bar.high/bar.low), 2);
+			}
+			sigma = Math.sqrt((1./(4*Math.log(2.)))*r_pow);
+			return sigma;
+		}
+		return 0;
+	}
 }

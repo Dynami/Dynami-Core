@@ -63,6 +63,10 @@ public interface IData {
 		return engine.compute(this, period);
 	}
 	
+	public boolean isCompressionRateSat();
+	
+	public boolean setAutoCompressionRate();
+	
 	public static enum TimeUnit {
 		Tick(0),
 		Second(1_000L),
