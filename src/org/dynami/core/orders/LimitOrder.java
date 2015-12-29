@@ -16,11 +16,11 @@
 package org.dynami.core.orders;
 
 public class LimitOrder extends OrderRequest {
-	public LimitOrder(String symbol, int quantity, long price, String note) {
+	public LimitOrder(String symbol, int quantity, double price, String note) {
 		super(symbol, quantity, price, note);
 	}
 	
-	public LimitOrder(String symbol, int quantity, long price) {
+	public LimitOrder(String symbol, int quantity, double price) {
 		super(symbol, quantity, price);
 	}
 }

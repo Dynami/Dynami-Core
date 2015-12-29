@@ -15,6 +15,8 @@
  */
 package org.dynami.core.data;
 
+import org.dynami.core.assets.Market;
+
 public interface IData {
 	public Series open();
 
@@ -61,6 +63,11 @@ public interface IData {
 	
 	public default double getVolatility(IVolatilityEngine engine, int period){
 		return engine.compute(this, period);
+	}
+	
+	public default double getAnnualizedVolatility(IVolatilityEngine engine, int period, Market market){
+		setAutoCompressionRate();
+		return engine.compute(this, period)*engine.annualizationFactor(getCompression(), period, market);
 	}
 	
 	public boolean isCompressionRateSat();
