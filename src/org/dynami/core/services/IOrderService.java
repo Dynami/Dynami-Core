@@ -22,6 +22,10 @@ import org.dynami.core.orders.OrderRequest;
 
 public interface IOrderService {
 	public static final String ID = "IOrderService";
+	
+	public static enum Status {
+		Pending, Executed, Rejected, PartiallyExecuted, Cancelled;
+	};
 
 	/**
 	 * Sends an order request to the market and sets specific behavior during order request life cycle.
@@ -50,6 +54,13 @@ public interface IOrderService {
 	 * @return requested order request
 	 */
 	public OrderRequest getOrderById(long id);
+	
+	/**
+	 * Retrieves the order request status
+	 * @param id 
+	 * @return
+	 */
+	public Status getOrderStatus(long id);
 
 	/**
 	 * Sends a cancel signal for a previous order request
