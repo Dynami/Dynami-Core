@@ -31,7 +31,7 @@ public interface IVolatilityEngine {
 		} else {
 			final Duration duration = Duration.between(market.getOpenTime(), market.getCloseTime());
 			final long milliSeconds = duration.getSeconds() * 1_000L;
-			factor = (DUtils.YEAR_WORKDAYS * (milliSeconds / compresssionRate))/period;
+			factor = ((double)DUtils.YEAR_WORKDAYS * ((double)milliSeconds / (double)compresssionRate))/(double)period;
 		}
 		return Math.sqrt(factor);
 	}
