@@ -37,9 +37,8 @@ public interface Config {
 		double min() default 0;
 		double max() default Double.MAX_VALUE;
 		double step() default 0.1;
-		boolean observable() default false;
 		Type type() default Type.JavaType;
-		Class<?>[] values() default {};
+		String[] values() default {};
 	}
 	
 	public static enum Type {

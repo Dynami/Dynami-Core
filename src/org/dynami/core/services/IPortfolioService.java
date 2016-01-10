@@ -56,6 +56,8 @@ public interface IPortfolioService {
 	public double unrealized(String symbol);
 	
 	public double unrealized();
+	
+	public double requiredMargin();
 
 	public Collection<ExecutedOrder> executedOrdersLog();
 }
