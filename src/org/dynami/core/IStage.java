@@ -15,6 +15,11 @@
  */
 package org.dynami.core;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * IStage implementation is the core part of the trading strategy. 
  * IStage contains the behavior of trading system defined by user.
@@ -52,4 +57,10 @@ public interface IStage {
 	 */
 	public void process(final IDynami dynami, Event event);
 	
+	@Target({ElementType.METHOD})
+	@Retention(RetentionPolicy.RUNTIME)
+	public static @interface Filter {
+		Event.Type[] event() default {}; 
+		String[] symbol() default {};
+	}
 }

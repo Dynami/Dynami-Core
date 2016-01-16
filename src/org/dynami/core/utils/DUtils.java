@@ -21,6 +21,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
 
 import org.dynami.core.assets.Asset.Option;
 
@@ -114,14 +117,22 @@ public class DUtils {
 		return out;
 	}
 	
-	public static boolean in(Number in, Number...compare){
-		for(Number n:compare){
+	@SafeVarargs
+	public static <T> boolean in(T in, T...compare){
+		for(T n:compare){
 			if(n.equals(in)){
 				return true;
 			}
 		}
 		return false;
 	}
+	
+//	public static <T> boolean contains(T[] values, T value){
+//		for(T t:values){
+//			if(t.equals(value)) return true;
+//		}
+//		return false;
+//	}
 	
 	public static String getErrorMessage(Throwable e){
 		StringBuilder buffer = new StringBuilder();
@@ -208,5 +219,29 @@ public class DUtils {
 	 */
 	public static double putPrice(double callPrice, double spotPrice, double strike, double maturity, double riskFreeRate){
 		return callPrice-spotPrice+strike-Math.exp(-riskFreeRate*maturity);
+	}
+	
+	public static void threadSafe(Runnable r){
+		Lock lock = new ReentrantLock();
+		if(lock.tryLock()){
+			try {
+				r.run();
+			} finally {
+				lock.unlock();
+			}
+		}
+	}
+	
+	public static <T,R> R threadSafe(Function<T, R> exec, T param){
+		Lock lock = new ReentrantLock();
+		if(lock.tryLock()){
+			try {
+				return exec.apply(param);
+			} finally {
+				lock.unlock();
+			}
+		} else {
+			return null;
+		}
 	}
 }

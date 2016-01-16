@@ -47,6 +47,13 @@ public class Event implements Comparable<Event> {
 		return (types^type.value()) < types;
 	}
 	
+	public boolean isOneOfThese(Type...type){
+		for(Type t:type){
+			if(is(t)) return true;
+		}
+		return false;
+	}
+	
 	
 	@Override
 	public int compareTo(Event o) {

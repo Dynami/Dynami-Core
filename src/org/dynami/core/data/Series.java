@@ -160,6 +160,22 @@ public class Series implements Cloneable, Iterable<Double> {
 		return math(other, (a, b)-> a/b);
 	}
 	
+	public double max(int lastNvalues){
+		double out = -Double.MAX_VALUE;
+		for(int i = 0 ; i < lastNvalues; i++){
+			if(last(i) > out) out = last(i);
+		}
+		return out;
+	}
+	
+	public double min(int lastNvalues){
+		double out = Double.MAX_VALUE;
+		for(int i = 0 ; i < lastNvalues; i++){
+			if(last(i) < out) out = last(i);
+		}
+		return out;
+	}
+	
 	public boolean goesUp(int lastNvalues){
 		assert size() < lastNvalues : "lastNvalues is bigger than size";
 		return last(lastNvalues) < last();
@@ -237,7 +253,7 @@ public class Series implements Cloneable, Iterable<Double> {
 	}
 	
 	public double[] toArray(final int start, final int end){
-		final int length = end - start;
+		final int length = end - start +1;
 		final double[] out = new double[length];
 		System.arraycopy(data, start, out, 0, length);
 		return out;
