@@ -18,9 +18,9 @@ package org.dynami.core.bus;
 
 public interface IMsg {
 	public static final String ID = "Msg.Broker";
-	
+
 	public static final String FORCE_SYNC = "FORCE_SYNC";
-	
+
 	/**
 	 * Subscribe topic
 	 * @param topic
@@ -34,13 +34,13 @@ public interface IMsg {
 	 * @param handler
 	 */
 	public abstract void unsubscribe(String topic, Handler handler);
-	
+
 	/**
 	 * Removes all listeners for a specific topic
 	 * @param topic
 	 */
 	public abstract void unsubscribeAllFor(String topic);
-	
+
 	/**
 	 * Removes topic from event broker, no more messages will be delivered to topic listeners
 	 * @param topic
@@ -49,13 +49,13 @@ public interface IMsg {
 
 	/**
 	 * Sends asynchronously a message to subscribers
-	 * @param topic 
+	 * @param topic
 	 * @param msg object passed with message
 	 * @return true if topic exists, false otherwise
 	 */
 	public abstract boolean async(String topic, Object msg);
 
-	
+
 	//public abstract boolean async(String topic, Object msg, Runnable callback);
 
 	/**
@@ -65,21 +65,23 @@ public interface IMsg {
 	 * @return true if topic exists, false otherwise
 	 */
 	public abstract boolean sync(String topic, Object msg);
-	
+
 	/**
 	 * Forces sync messages even if async methods are used
 	 * @param forceSync
 	 */
 	public abstract void forceSync(boolean forceSync);
-	
+
 	public boolean dispose();
-	
+
+	public default void reset(){};
+
 	@FunctionalInterface
 	public static interface Handler {
 		/**
 		 * Handles messages published on topic.
 		 * Refers to {@link MsgTopics} for defined topics and class type message
-		 * @param last indicates if the message is the last arrived for the topic 
+		 * @param last indicates if the message is the last arrived for the topic
 		 * @param msg message object
 		 */
 		public void update(boolean last, Object msg);

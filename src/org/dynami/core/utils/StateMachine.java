@@ -22,11 +22,11 @@ import java.util.function.Supplier;
 public class StateMachine {
 	private final List<ChangeStateListener> listeners = new CopyOnWriteArrayList<>();
 	private IState current = null;
-	
+
 	public StateMachine(Supplier<IState> config){
 		current = config.get();
 	}
-	
+
 	public boolean changeState(final IState newState){
 		if(current.canMoveTo(newState)){
 			final IState oldState = current;
@@ -34,33 +34,33 @@ public class StateMachine {
 			for(ChangeStateListener l:listeners){
 				l.changed(oldState, newState);
 			}
-			//System.out.println("StateMachine.changeState("+newState.toString()+" : "+newState.ordinal()+")");
+			System.out.println("StateMachine.changeState("+newState.toString()+" : "+newState.ordinal()+")");
 			return true;
 		}
 		return false;
 	}
-	
+
 	public void addListener(ChangeStateListener listener){
 		listeners.add(listener);
 	}
-	
+
 	public IState getCurrentState(){
 		return current;
 	}
-	
-	
+
+
 	public boolean canChangeState(final IState newState){
 		return current.canMoveTo(newState);
 	}
-	
+
 	@FunctionalInterface
 	public static interface ChangeStateListener {
 		public void changed(IState oldState, IState newState);
 	}
-	
+
 	public static interface IState {
 		//public final List<IState> children = new ArrayList<>();
-		
+
 		public default void addChildren(IState... nodes){
 			for(IState n:nodes){
 				children().add(n);
@@ -78,7 +78,7 @@ public class StateMachine {
 		public default boolean equals(IState node){
 			return ordinal() == node.ordinal();
 		};
-		
+
 
 		public default boolean in(IState... nodes){
 			for(IState n:nodes){
@@ -87,9 +87,9 @@ public class StateMachine {
 			}
 			return false;
 		};
-		
+
 		public abstract List<IState> children();
-		
+
 		public abstract int ordinal();
 	}
 }
