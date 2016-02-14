@@ -18,6 +18,7 @@ package org.dynami.core.data;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class Series implements Cloneable, Iterable<Double> {
 	private static final int BUFFER_SIZE = 1024;
@@ -108,13 +109,36 @@ public class Series implements Cloneable, Iterable<Double> {
 		};
 	}
 
+	private Series math(Function<Double, Double> operand){
+		int _innerlength = size();
+		Series _new = new Series();
+		for(int i = 0; i < _innerlength; i++){
+			_new.append(operand.apply(get(i)));
+		}
+		return _new;
+	}
+
+	private Series math(int shift, BiFunction<Double, Double, Double> operand){
+		int _innerlength = size();
+		assert shift > _innerlength : "Shift must be lower equals than size";
+		Series _new = new Series();
+		for(int i = 0; i < _innerlength; i++){
+			if(i < shift){
+				_new.append(Double.NaN);
+			} else {
+				_new.append(operand.apply(get(i), get(i-shift)));
+			}
+		}
+		return _new;
+	}
+
 	private Series math(Series other, BiFunction<Double, Double, Double> operand){
 		int _otherLength = other.size();
 		int _innerlength = size();
 		assert _otherLength != _innerlength : "Series have different size";
 		Series _new = clone();
 		for(int i = 0; i < _innerlength; i++){
-			_new.data[i] = operand.apply(data[i], other.get(i));
+			_new.append(operand.apply(data[i], other.get(i)));
 		}
 		return _new;
 	}
@@ -123,11 +147,42 @@ public class Series implements Cloneable, Iterable<Double> {
 		int _innerlength = size();
 		Series _new = clone();
 		for(int i = 0; i < _innerlength; i++){
-			_new.data[i] = operand.apply(data[i], other);
+			_new.append(operand.apply(data[i], other));
 		}
 		return _new;
 	}
 
+	public Series log(){
+		return math(a-> Math.log(a));
+	}
+
+	public Series sqrt(){
+		return math(a->Math.sqrt(a));
+	}
+
+	public Series pow(double power){
+		return math(a-> Math.pow(a, power));
+	}
+
+	public Series sin(){
+		return math(a-> Math.sin(a));
+	}
+
+	public Series add(int shift){
+		return math(shift, (a, b)-> a+b);
+	}
+
+	public Series substract(int shift){
+		return math(shift, (a, b)-> a-b);
+	}
+
+	public Series multiply(int shift){
+		return math(shift, (a, b)-> a*b);
+	}
+
+	public Series divide(int shift){
+		return math(shift, (a, b)-> a/b);
+	}
 
 	public Series add(Series other){
 		return math(other, (a, b)-> a+b);
