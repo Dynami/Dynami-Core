@@ -26,17 +26,17 @@ public interface IPortfolioService {
 	public static final String ID = "IPortfolioService";
 
 	public void setInitialBudget(double budget);
-	
+
 	public double getInitialBudget();
 
 	public double getCurrentBudget();
 
 	public boolean isOnMarket();
-	
+
 	public boolean isFlat();
 
 	public boolean isOnMarket(String symbol);
-	
+
 	public boolean isFlat(String symbol);
 
 	public boolean isLong(String symbol);
@@ -54,10 +54,26 @@ public interface IPortfolioService {
 	public double realized();
 
 	public double unrealized(String symbol);
-	
+
 	public double unrealized();
-	
+
 	public double requiredMargin();
 
 	public Collection<ExecutedOrder> executedOrdersLog();
+
+	public Greeks getPortfolioGreeks();
+
+	public static class Greeks{
+		public final double delta;
+		public final double gamma;
+		public final double vega;
+		public final double theta;
+
+		public Greeks(double delta, double gamma, double vega, double theta){
+			this.delta = delta;
+			this.gamma = gamma;
+			this.vega = vega;
+			this.theta = theta;
+		}
+	}
 }

@@ -36,21 +36,32 @@ public class OptionChain {
 			add(o);
 		}
 	}
-	
+
+	public long getExpirationTime(int foreward){
+		int i = 0;
+		for(long exp : expirations){
+			if(i == foreward){
+				return exp;
+			}
+			i++;
+		}
+		return frontExpiration();
+	}
+
 	public long frontExpiration(){
 		if(expirations.size()>0)
 			return expirations.first();
 		else
 			return 0;
 	}
-	
+
 	public long farExpiration(){
 		if(expirations.size()>0)
 			return expirations.last();
 		else
 			return 0;
 	}
-	
+
 	public int cleanExpired(){
 		AtomicInteger removed = new AtomicInteger(0);
 		for(OptionRecord or:options){
@@ -82,7 +93,7 @@ public class OptionChain {
 				.sorted((r1, r2)->Long.compare(r1.strike, r2.strike))
 				.toArray(OptionRecord[]::new);
 	}
-	
+
 	private int searchIndexByExpire(OptionRecord[] items, long expire){
 		int idx = -1;
 		int from=0, to=items.length-1;
@@ -93,7 +104,7 @@ public class OptionChain {
 			} else if(from == to && items[to].expire != expire){
 				break;
 			}
-			
+
 			if(items[from+(to-from)/2].expire <= expire){
 				from += (to-from)/2+(((to-from)%2==1)?1:0);
 			} else {
@@ -102,7 +113,7 @@ public class OptionChain {
 		} while(true);
 		return idx;
 	}
-	
+
 	private int searchIndexByStrike(OptionRecord[] items, long strike){
 		int idx = -1;
 		int from=0, to=items.length-1;
@@ -113,7 +124,7 @@ public class OptionChain {
 			} else if(from == to && items[to].strike != strike){
 				break;
 			}
-			
+
 			if(items[from+(to-from)/2].strike <= strike){
 				from += (to-from)/2+(((to-from)%2==1)?1:0);
 			} else {
@@ -122,13 +133,13 @@ public class OptionChain {
 		} while(true);
 		return idx;
 	}
-	
+
 	public Asset.Option upperStrike(Asset.Option opt, int numberOfStrikes){
 		final OptionRecord[] items = getByExpire(opt.expire, opt.type);
 		final int idx = searchIndexByStrike(items, DUtils.d2l(opt.strike));
 		return (idx >= 0 && idx+numberOfStrikes < items.length)?items[idx+numberOfStrikes].option:null;
 	}
-	
+
 	public Asset.Option lowerStrike(Asset.Option opt, int numberOfStrikes){
 		final OptionRecord[] items = getByExpire(opt.expire, opt.type);
 		final int idx = searchIndexByStrike(items, DUtils.d2l(opt.strike));
@@ -228,14 +239,16 @@ public class OptionChain {
 		OptionRecord[] subset = options.stream()
 				.filter(o->o.expire == expire)
 				.filter(o->o.type.equals(type))
-				.sorted((o1, o2)-> Double.compare(o1.option.greeks().delta(), o2.option.greeks().delta()))
+				.sorted((o1, o2)-> Double.compare(o2.option.greeks().delta(), o1.option.greeks().delta()))
 				.toArray(OptionRecord[]::new);
 
 		OptionRecord upper = subset[subset.length-1], lower = subset[0];
 
 		for(int i = 0; i < subset.length; i++){
-			if(subset[i].option.greeks().delta() <= delta) lower = subset[i];
-			if(subset[subset.length-i-1].option.greeks().delta() >= delta) upper = subset[subset.length-i-1];
+			if(subset[i].option.greeks().delta() >= delta)
+				lower = subset[i];
+			if(subset[subset.length-i-1].option.greeks().delta() <= delta)
+				upper = subset[subset.length-i-1];
 		}
 
 		double upperDistance = upper.option.greeks().delta() - delta;
@@ -264,8 +277,10 @@ public class OptionChain {
 			this.type = type;
 			this.option = option;
 		}
-//		public Option getOption() {
-//			return option;
-//		}
+
+		@Override
+		public String toString() {
+			return option.toString();
+		}
 	}
 }

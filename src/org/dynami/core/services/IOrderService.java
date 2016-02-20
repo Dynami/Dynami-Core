@@ -129,7 +129,7 @@ public interface IOrderService {
 		 * @param dynami
 		 * @param order
 		 */
-		public default void onOrderRefused(final IDynami dynami, final OrderRequest order){};
+		public default void onOrderRejected(final IDynami dynami, final OrderRequest order){};
 
 		/**
 		 * It's invoked when the order request encounter some kind of errors

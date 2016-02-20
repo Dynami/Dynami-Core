@@ -52,6 +52,11 @@ public abstract class Asset implements Comparable<Asset> {
 		return this.family.equals(family);
 	}
 
+	@Override
+	public String toString() {
+		return symbol;
+	}
+
 	private Asset(Family family, String symbol, String isin, String name, double pointValue, double tick, Market market){
 		this.family = family;
 		this.symbol = symbol;
@@ -231,11 +236,14 @@ public abstract class Asset implements Comparable<Asset> {
 			return pricingEngine.compute(this, DTime.Clock.getTime(), underlyingAsset.asTradable().lastPrice(), volatility, riskFreeRate.get());
 		}
 
-		public Margin margination(double price, long quantity) {
+		public Margin margination(double price, long quantity, double entryPrice) {
 			double upper = price*(1+requiredMargin);
 			double lower = price*(1-requiredMargin);
-			double upperValue = getValueAt(upper, DTime.Clock.getTime(), pricingEngine)*quantity*pointValue;
-			double lowerValue = getValueAt(lower, DTime.Clock.getTime(), pricingEngine)*quantity*pointValue;
+
+			double initial = entryPrice*quantity*pointValue*((quantity>0)?-1:1);
+
+			double upperValue = getValueAt(upper, DTime.Clock.getTime(), pricingEngine)*quantity*pointValue+initial;
+			double lowerValue = getValueAt(lower, DTime.Clock.getTime(), pricingEngine)*quantity*pointValue+initial;
 
 			return new Margin(lowerValue, upperValue);
 		}
