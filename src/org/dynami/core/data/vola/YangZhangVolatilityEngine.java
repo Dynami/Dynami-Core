@@ -15,14 +15,14 @@
  */
 package org.dynami.core.data.vola;
 
+import org.apache.commons.math3.stat.StatUtils;
 import org.dynami.core.data.Bar;
 import org.dynami.core.data.IData;
 import org.dynami.core.data.IVolatilityEngine;
 import org.dynami.core.data.Series;
-import org.dynami.core.utils.StatUtils;
 
 public class YangZhangVolatilityEngine implements IVolatilityEngine {
-	private RogersSatchellVolatilityEngine rogerSatchellVolaEngine = new RogersSatchellVolatilityEngine(); 
+	private RogersSatchellVolatilityEngine rogerSatchellVolaEngine = new RogersSatchellVolatilityEngine();
 	@Override
 	public double compute(IData data, int period) {
 		int size = data.size();
@@ -39,20 +39,20 @@ public class YangZhangVolatilityEngine implements IVolatilityEngine {
 				overNigthJumpAvg.append(Math.log(bar.open/bar_1.close));
 				openToCloseJumpAvg.append(Math.log(bar.close/bar.open));
 			}
-			
-			double overNightAvg = StatUtils.avg(overNigthJumpAvg);
-			double openToCloseAvg = StatUtils.avg(openToCloseJumpAvg);
+
+			double overNightAvg = StatUtils.mean(overNigthJumpAvg.toArray());
+			double openToCloseAvg = StatUtils.mean(openToCloseJumpAvg.toArray());
 			for(int i = size-period; i < size; i++){
 				bar = data.get(i);
 				bar_1 = data.get(i-1);
-				
+
 				overnightSum += Math.pow( Math.log(bar.open/bar_1.close)-overNightAvg, 2);
 				openToCloseSum += Math.pow( Math.log(bar.close/bar.open)-openToCloseAvg, 2);
 			}
-			
+
 			overnightSigma = (1./((double)period-1.))*overnightSum;
 			openToCloseSigma = (1./((double)period-1.))*openToCloseSum;
-			
+
 			sigma = Math.sqrt( overnightSigma+k*openToCloseSigma+(1-k)*rogerSatchellVola);
 			return sigma;
 		}

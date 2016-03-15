@@ -5,12 +5,10 @@ import org.dynami.core.data.Series;
 public class SeriesTest {
 	public static void main(String[] args) {
 		try {
-			double[] data = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-			Series s = new Series(data);
-			Series d = s.divide(10).log();
-			System.out.println(d);
-
-
+			double[] _data = {10.1, 10.4, 10.8, 10.1, 10, 9.8, 9.7, 10.5, 10.7, 10.1, 10.4, 10.8, 10.6};
+			Series r1 = new Series(_data).lagAndDivide(1).omitNaN();
+			System.out.println("------------");
+			System.out.println(r1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

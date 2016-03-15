@@ -20,11 +20,16 @@ import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
 public class Series implements Cloneable, Iterable<Double> {
-	private static final int BUFFER_SIZE = 1024;
-	private double[] data;
+//	private static final int BUFFER_SIZE = 100;
+//	private SummaryStatistics stats = new SummaryStatistics();
+//	private ResizableDoubleArray stats = new ResizableDoubleArray(BUFFER_SIZE);
+	private DescriptiveStatistics stats = new DescriptiveStatistics();
+//	private double[] data;
 	private int cursor;
-	private double min, max;
+//	private double min, max;
 
 	public Series(){
 		clear();
@@ -37,57 +42,67 @@ public class Series implements Cloneable, Iterable<Double> {
 		}
 	}
 
-	public double set(int idx, double v){
-		assert idx >= 0 && idx < cursor : "Out of range index";
-		double tmp = data[idx];
-		data[idx] = v;
-		return tmp;
-	}
+//	public double set(int idx, double v){
+//		stats.getValues();
+//		assert idx >= 0 && idx < cursor : "Out of range index";
+//		double tmp = data[idx];
+//		data[idx] = v;
+//		return tmp;
+//	}
 
 	public void append(double d){
-		if(cursor >= data.length){
-			double[] tmp = new double[cursor+BUFFER_SIZE];
-			System.arraycopy(data, 0, tmp, 0, cursor);
-			data = tmp;
-		}
-		if(d > max) max = d;
-		if(d < min) min = d;
-		data[cursor++] = d;
+//		if(cursor >= data.length){
+//			double[] tmp = new double[cursor+BUFFER_SIZE];
+//			System.arraycopy(data, 0, tmp, 0, cursor);
+//			data = tmp;
+//		}
+//		if(d > max) max = d;
+//		if(d < min) min = d;
+		stats.addValue(d);
+		cursor++;
+//		data[cursor++] = d;
 	}
 
 	public void clear(){
 		cursor = 0;
-		data = new double[BUFFER_SIZE];
-		min = Long.MAX_VALUE;
-		max = Long.MIN_VALUE;
+//		data = new double[BUFFER_SIZE];
+		stats.clear();
+//		min = Long.MAX_VALUE;
+//		max = Long.MIN_VALUE;
 	}
 
 	public double last(){
 		assert cursor < 1 : "No data!";
-		return data[cursor-1];
+//		return data[cursor-1];
+		return stats.getElement(cursor-1);
 	}
 
 	public double last(int retro){
 		assert cursor - retro < 1 : "No data!";
-		return data[cursor-1-retro];
+		return stats.getElement(cursor-1-retro);
+//		return data[cursor-1-retro];
 	}
 
 	public double first(){
 		assert cursor > 0 : "No data!";
-		return data[0];
+//		return data[0];
+		return stats.getElement(0);
 	}
 
 	public double get(int index){
 		assert cursor >= index  : "No data!";
-		return data[index];
+//		return data[index];
+		return stats.getElement(index);
 	}
 
 	public double max(){
-		return max;
+//		return max;
+		return stats.getMax();
 	}
 
 	public double min(){
-		return min;
+		return stats.getMin();
+		//return min;
 	}
 
 	public int size(){
@@ -104,7 +119,8 @@ public class Series implements Cloneable, Iterable<Double> {
 
 			@Override
 			public Double next() {
-				return data[index++];
+				return stats.getElement(index++);
+				//return data[index++];
 			}
 		};
 	}
@@ -136,18 +152,18 @@ public class Series implements Cloneable, Iterable<Double> {
 		int _otherLength = other.size();
 		int _innerlength = size();
 		assert _otherLength != _innerlength : "Series have different size";
-		Series _new = clone();
+		Series _new = new Series();
 		for(int i = 0; i < _innerlength; i++){
-			_new.append(operand.apply(data[i], other.get(i)));
+			_new.append(operand.apply(get(i), other.get(i)));
 		}
 		return _new;
 	}
 
 	private Series math(double other, BiFunction<Double, Double, Double> operand){
 		int _innerlength = size();
-		Series _new = clone();
+		Series _new = new Series();
 		for(int i = 0; i < _innerlength; i++){
-			_new.append(operand.apply(data[i], other));
+			_new.append(operand.apply(get(i), other));
 		}
 		return _new;
 	}
@@ -172,15 +188,15 @@ public class Series implements Cloneable, Iterable<Double> {
 		return math(shift, (a, b)-> a+b);
 	}
 
-	public Series substract(int shift){
+	public Series lagAndSubstract(int shift){
 		return math(shift, (a, b)-> a-b);
 	}
 
-	public Series multiply(int shift){
+	public Series lagAndMultiply(int shift){
 		return math(shift, (a, b)-> a*b);
 	}
 
-	public Series divide(int shift){
+	public Series lagAndDivide(int shift){
 		return math(shift, (a, b)-> a/b);
 	}
 
@@ -192,7 +208,7 @@ public class Series implements Cloneable, Iterable<Double> {
 		return math(other, (a, b)-> a-b);
 	}
 
-	public Series multiply(Series other){
+	public Series times(Series other){
 		return math(other, (a, b)-> a*b);
 	}
 
@@ -200,11 +216,11 @@ public class Series implements Cloneable, Iterable<Double> {
 		return math(other, (a, b)-> a/b);
 	}
 
-	public Series add(double other){
+	public Series plus(double other){
 		return math(other, (a, b)-> a+b);
 	}
 
-	public Series substract(double other){
+	public Series minus(double other){
 		return math(other, (a, b)-> a-b);
 	}
 
@@ -222,6 +238,10 @@ public class Series implements Cloneable, Iterable<Double> {
 			if(last(i) > out) out = last(i);
 		}
 		return out;
+	}
+
+	public DescriptiveStatistics stats(){
+		return stats;
 	}
 
 	public double min(int lastNvalues){
@@ -299,9 +319,10 @@ public class Series implements Cloneable, Iterable<Double> {
 	}
 
 	public double[] toArray(){
-		double[] out = new double[cursor];
-		System.arraycopy(data, 0, out, 0, cursor);
-		return out;
+		return stats.getValues();
+//		double[] out = new double[cursor];
+//		System.arraycopy(data, 0, out, 0, cursor);
+//		return out;
 	}
 
 	public Series subset(int start, int end){
@@ -312,17 +333,56 @@ public class Series implements Cloneable, Iterable<Double> {
 		return subset(size()-lastNValues, size()-1);
 	}
 
+	public Series lag(int shift){
+		return lag(shift, true);
+	}
+
+	public Series omitNaN(){
+		Series s = new Series();
+		int lenght = size();
+		for(int i = 0; i < lenght; i++){
+			double t = get(i);
+			if(!Double.isNaN(t)){
+				s.append(t);
+			}
+		}
+		return s;
+	}
+
+	public Series lag(int shift, boolean sameSize){
+		if(sameSize){
+			final int length = size();
+			final double[] out = new double[length];
+			for(int i = length-shift-1 ; i >= 0; i--){
+				out[i+shift] = get(i);
+			}
+			for(int i= 0; i < shift; i++){
+				out[i] = Double.NaN;
+			}
+			return new Series(out);
+		} else {
+			final int length = size();
+			final double[] out = new double[length-shift];
+			for(int i = length-shift-1 ; i >= 0; i--){
+				out[i] = get(i);
+			}
+			return new Series(out);
+		}
+	}
+
 	public double[] toArray(final int start, final int end){
+		double[] tmp = stats.getValues();
 		final int length = end - start +1;
 		final double[] out = new double[length];
-		System.arraycopy(data, start, out, 0, length);
+		System.arraycopy(tmp, start, out, 0, length);
 		return out;
 	}
 
 	public double[] toArray(final int start){
+		double[] tmp = stats.getValues();
 		int length = this.cursor - start;
 		double[] out = new double[length];
-		System.arraycopy(data, start, out, 0, length);
+		System.arraycopy(tmp, start, out, 0, length);
 		return out;
 	}
 
@@ -338,11 +398,12 @@ public class Series implements Cloneable, Iterable<Double> {
 	@Override
 	protected Series clone() {
 		Series copy = new Series();
-		copy.data = new double[data.length];
-		System.arraycopy(data, 0, copy.data, 0, data.length);
+//		copy.data = new double[data.length];
+//		System.arraycopy(data, 0, copy.data, 0, data.length);
 		copy.cursor = cursor;
-		copy.max = max;
-		copy.min = min;
+//		copy.max = max;
+//		copy.min = min;
+		copy.stats = stats.copy();
 		return copy;
 	}
 }

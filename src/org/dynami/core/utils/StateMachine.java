@@ -34,7 +34,7 @@ public class StateMachine {
 			for(ChangeStateListener l:listeners){
 				l.changed(oldState, newState);
 			}
-			System.out.println("StateMachine.changeState("+newState.toString()+" : "+newState.ordinal()+")");
+//			System.out.println("StateMachine.changeState("+newState.toString()+" : "+newState.ordinal()+")");
 			return true;
 		}
 		return false;

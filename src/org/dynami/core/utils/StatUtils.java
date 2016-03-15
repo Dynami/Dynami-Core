@@ -25,11 +25,11 @@ public class StatUtils {
 		}
 		return sum;
 	}
-	
+
 	public static double avg(Series series){
 		return cumSum(series)/series.size();
 	}
-	
+
 	public static double std(Series series){
 		double avg = avg(series);
 		double sum = 0;
@@ -38,7 +38,7 @@ public class StatUtils {
 		}
 		return Math.sqrt(sum/(series.size()-1.));
 	}
-	
+
 	public static double relativeStd(Series series){
 		double std = std(series);
 		double avg = avg(series);

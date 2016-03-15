@@ -15,6 +15,7 @@
  */
 package org.dynami.core.bus;
 
+import java.util.Set;
 
 public interface IMsg {
 	public static final String ID = "Msg.Broker";
@@ -42,10 +43,34 @@ public interface IMsg {
 	public abstract void unsubscribeAllFor(String topic);
 
 	/**
+	 * Remove all listeners for the specified topics
+	 * @param topics
+	 */
+	public default void unsubscribeAllFor(String...topics){
+		for(String topic:topics)
+			unsubscribeAllFor(topic);
+	};
+
+	public default void unsubscribeAllTopicsStartingWith(String topic){
+		final Set<String> topics = getTopics();
+		for(String t:topics){
+			if(t.startsWith(topic)){
+				unsubscribeAllFor(t);
+			}
+		}
+	}
+
+	/**
 	 * Removes topic from event broker, no more messages will be delivered to topic listeners
 	 * @param topic
 	 */
 	public abstract void removeTopic(String topic);
+
+	/**
+	 * Returns topics' name
+	 * @return
+	 */
+	public abstract Set<String> getTopics();
 
 	/**
 	 * Sends asynchronously a message to subscribers

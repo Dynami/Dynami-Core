@@ -41,6 +41,14 @@ public abstract class Asset implements Comparable<Asset> {
 		return super.equals(obj);
 	};
 
+	public <T> T as(Class<T> clazz){
+		try {
+			return clazz.cast(this);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	public Asset.Tradable asTradable(){
 		if(this instanceof Asset.Tradable)
 			return (Asset.Tradable)this;

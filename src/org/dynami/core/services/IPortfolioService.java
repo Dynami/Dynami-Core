@@ -43,33 +43,37 @@ public interface IPortfolioService {
 
 	public boolean isShort(String symbol);
 
-	public List<OpenPosition> getOpenPosition();
+	public List<OpenPosition> getOpenPositions();
 
 	public OpenPosition getPosition(String symbol);
 
-	public List<ClosedPosition> getClosedPosition();
+	public List<ClosedPosition> getClosedPositions();
 
-	public List<ClosedPosition> getClosedPosition(String symbol);
+	public List<ClosedPosition> getClosedPositions(String symbol);
 
-	public double realized();
+	public double realised();
 
-	public double unrealized(String symbol);
+	public double unrealised(String symbol);
 
-	public double unrealized();
+	public double unrealised();
+
+	public double commissions();
 
 	public double requiredMargin();
 
-	public Collection<ExecutedOrder> executedOrdersLog();
+	public Collection<ExecutedOrder> executedOrders();
 
 	public Greeks getPortfolioGreeks();
 
 	public static class Greeks{
+		public final double underlyingPrice;
 		public final double delta;
 		public final double gamma;
 		public final double vega;
 		public final double theta;
 
-		public Greeks(double delta, double gamma, double vega, double theta){
+		public Greeks(double underlyingPrice, double delta, double gamma, double vega, double theta){
+			this.underlyingPrice = underlyingPrice;
 			this.delta = delta;
 			this.gamma = gamma;
 			this.vega = vega;

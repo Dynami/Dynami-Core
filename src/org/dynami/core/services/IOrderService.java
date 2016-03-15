@@ -22,7 +22,7 @@ import org.dynami.core.orders.OrderRequest;
 
 public interface IOrderService {
 	public static final String ID = "IOrderService";
-	
+
 	public static enum Status {
 		Pending, Executed, Rejected, PartiallyExecuted, Cancelled;
 	};
@@ -42,7 +42,34 @@ public interface IOrderService {
 	 * @return order request unique identifier
 	 */
 	public long send(OrderRequest order);
-	
+
+	/**
+	 * Sends a market order
+	 * @param symbol
+	 * @param quantity
+	 * @return order request unique identifier
+	 */
+	public long marketOrder(String symbol, long quantity);
+
+	/**
+	 * Sends a market order
+	 * @param symbol
+	 * @param quantity
+	 * @param note
+	 * @return order request unique identifier
+	 */
+	public long marketOrder(String symbol, long quantity, String note);
+
+	/**
+	 * Sends a market order
+	 * @param symbol
+	 * @param quantity
+	 * @param note
+	 * @param handler
+	 * @return order request unique identifier
+	 */
+	public long marketOrder(String symbol, long quantity, String note, IOrderHandler handler);
+
 	/**
 	 * Removes every pending orders and pending conditions such as stop loss or take profit
 	 */
@@ -54,10 +81,10 @@ public interface IOrderService {
 	 * @return requested order request
 	 */
 	public OrderRequest getOrderById(long id);
-	
+
 	/**
 	 * Retrieves the order request status
-	 * @param id 
+	 * @param id
 	 * @return
 	 */
 	public Status getOrderStatus(long id);
