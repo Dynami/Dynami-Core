@@ -28,22 +28,6 @@ public interface IOrderService {
 	};
 
 	/**
-	 * Sends an order request to the market and sets specific behavior during order request life cycle.
-	 * @param order order request
-	 * @param handler order request handler
-	 * @return order request unique identifier
-	 * @see IOrderHandler
-	 */
-	//long send(OrderRequest order, IOrderHandler handler);
-
-	/**
-	 * Sends order request
-	 * @param order
-	 * @return order request unique identifier
-	 */
-	//long send(OrderRequest order);
-
-	/**
 	 * Sends a limit order price
 	 * @param symbol
 	 * @param price
