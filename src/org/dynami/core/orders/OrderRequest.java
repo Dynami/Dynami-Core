@@ -15,76 +15,83 @@
  */
 package org.dynami.core.orders;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.dynami.core.assets.Book;
-import org.dynami.core.utils.DTime;
+import org.dynami.core.services.IOrderService;
 import org.dynami.core.utils.DUtils;
 
-/**
- * @author Atria
- *
- */
-public abstract class OrderRequest {
-	private static final AtomicLong counter = new AtomicLong(0);
-	
-	public final long id;
+public class OrderRequest {
+	public final int id;
 	public final long time;
 	public final String symbol;
 	public final double price;
 	public final long quantity;
 	public final String note;
-	private final List<IOrderCondition> conditions = new ArrayList<>();
-	
-	public OrderRequest(String symbol, long quantity, double price, String note){
-		this.time = DTime.Clock.getTime();
+	public final IOrderService.IOrderHandler handler;
+	public final AtomicReference<IOrderService.Status> status = new AtomicReference<IOrderService.Status>(IOrderService.Status.Pending);
+
+	public OrderRequest(int id, long time, String symbol, long quantity, double price, String note, IOrderService.IOrderHandler handler){
+		this.time = time;
 		this.symbol = symbol;
 		this.price = price;
 		this.quantity = quantity;
 		this.note = note;
-		this.id = generateUniqueId();
+		this.id = id;
+		this.handler = handler;
 	}
-	
-	public OrderRequest(String symbol, long quantity, double price){
-		this.time = DTime.Clock.getTime();
-		this.symbol = symbol;
-		this.price = price;
-		this.quantity = quantity;
-		this.note = "";
-		this.id = generateUniqueId();
+
+	public void updateStatus(IOrderService.Status status){
+		this.status.set(status);
 	}
-	
+
 	public long getId() {
 		return id;
 	}
-		
-	public OrderRequest add(IOrderCondition condition){
-		conditions.add(condition);
-		return this;
+
+	public IOrderService.Status getStatus() {
+		return status.get();
 	}
-	
-	public Collection<IOrderCondition> conditions(){
-		return Collections.unmodifiableCollection(conditions);
-	}
-	
-	
+
+//	public OrderRequest add(IOrderCondition condition){
+//		conditions.add(condition);
+//		return this;
+//	}
+
+//	public Collection<IOrderCondition> conditions(){
+//		return Collections.unmodifiableCollection(conditions);
+//	}
+
+
 	public static interface IOrderCondition {
 		public boolean check(long quantity, Book.Orders bid, Book.Orders ask);
 	}
-	
-	private long generateUniqueId() {
-		return counter.getAndIncrement();
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		OrderRequest other = (OrderRequest) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 
 	@Override
 	public String toString() {
 		return "OrderRequest [id=" + id + ", time=" + DUtils.LONG_DATE_FORMAT.format(time) + ", symbol=" + symbol + ", price=" + String.format("%5.2f", price) + ", quantity="
-				+ quantity + ", note=" + note + ", conditions=" + conditions + "]";
+				+ quantity + ", note=" + note + "]";
 	}
-	
-	
 }

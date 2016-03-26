@@ -80,7 +80,6 @@ public interface IMsg {
 	 */
 	public abstract boolean async(String topic, Object msg);
 
-
 	//public abstract boolean async(String topic, Object msg, Runnable callback);
 
 	/**

@@ -34,14 +34,44 @@ public interface IOrderService {
 	 * @return order request unique identifier
 	 * @see IOrderHandler
 	 */
-	public long send(OrderRequest order, IOrderHandler handler);
+	//long send(OrderRequest order, IOrderHandler handler);
 
 	/**
 	 * Sends order request
 	 * @param order
 	 * @return order request unique identifier
 	 */
-	public long send(OrderRequest order);
+	//long send(OrderRequest order);
+
+	/**
+	 * Sends a limit order price
+	 * @param symbol
+	 * @param price
+	 * @param quantity
+	 * @param note
+	 * @param handler
+	 * @return order request id
+	 */
+	public long limitOrder(String symbol, double price, long quantity, String note, IOrderHandler handler);
+
+	/**
+	 * Sends a limit order price
+	 * @param symbol
+	 * @param price
+	 * @param quantity
+	 * @param note
+	 * @return order request id
+	 */
+	public long limitOrder(String symbol, double price, long quantity, String note);
+
+	/**
+	 * Sends a limit order price
+	 * @param symbol
+	 * @param price
+	 * @param quantity
+	 * @return order request id
+	 */
+	public long limitOrder(String symbol, double price, long quantity);
 
 	/**
 	 * Sends a market order
@@ -80,21 +110,21 @@ public interface IOrderService {
 	 * @param id
 	 * @return requested order request
 	 */
-	public OrderRequest getOrderById(long id);
+	public OrderRequest getOrderById(int id);
 
 	/**
 	 * Retrieves the order request status
 	 * @param id
 	 * @return
 	 */
-	public Status getOrderStatus(long id);
+	public Status getOrderStatus(int id);
 
 	/**
 	 * Sends a cancel signal for a previous order request
 	 * @param id order request unique identifier
 	 * @return true if the order request can be removed, false otherwise
 	 */
-	public boolean cancellOrder(long id);
+	public boolean cancelOrder(int id);
 
 	/**
 	 * Retrieve the list of pending order requests, whether there are not pending order request, the method retrieves an empty list.
