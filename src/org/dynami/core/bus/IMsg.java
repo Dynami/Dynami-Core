@@ -36,29 +36,29 @@ public interface IMsg {
 	 */
 	public abstract void unsubscribe(String topic, Handler handler);
 
-	/**
-	 * Removes all listeners for a specific topic
-	 * @param topic
-	 */
-	public abstract void unsubscribeAllFor(String topic);
+//	/**
+//	 * Removes all listeners for a specific topic
+//	 * @param topic
+//	 */
+//	public abstract void unsubscribeAllFor(String topic);
 
-	/**
-	 * Remove all listeners for the specified topics
-	 * @param topics
-	 */
-	public default void unsubscribeAllFor(String...topics){
-		for(String topic:topics)
-			unsubscribeAllFor(topic);
-	};
+//	/**
+//	 * Remove all listeners for the specified topics
+//	 * @param topics
+//	 */
+//	public default void unsubscribeAllFor(String...topics){
+//		for(String topic:topics)
+//			unsubscribeAllFor(topic);
+//	};
 
-	public default void unsubscribeAllTopicsStartingWith(String topic){
-		final Set<String> topics = getTopics();
-		for(String t:topics){
-			if(t.startsWith(topic)){
-				unsubscribeAllFor(t);
-			}
-		}
-	}
+//	public default void unsubscribeAllTopicsStartingWith(String topic){
+//		final Set<String> topics = getTopics();
+//		for(String t:topics){
+//			if(t.startsWith(topic)){
+//				unsubscribeAllFor(t);
+//			}
+//		}
+//	}
 
 	/**
 	 * Removes topic from event broker, no more messages will be delivered to topic listeners
@@ -110,5 +110,4 @@ public interface IMsg {
 		 */
 		public void update(boolean last, Object msg);
 	}
-
 }

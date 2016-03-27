@@ -27,10 +27,10 @@ import org.dynami.core.data.Bar;
 public class Event implements Comparable<Event> {
 	public final long id;
 	public final String symbol;
-	public final int types; 
+	public final int types;
 	public final Bar bar;
 	public final Book.Orders item;
-	
+
 	private Event(long id, String symbol, Bar bar, Book.Orders item, Type...type) {
 		this.id = id;
 		this.symbol = symbol;
@@ -38,28 +38,28 @@ public class Event implements Comparable<Event> {
 		this.item = item;
 		int sum = 0;
 		for(Type t:type){
-			sum |= t.value(); 
+			sum |= t.value();
 		}
 		types = sum;
 	}
-	
+
 	public boolean is(Type type){
 		return (types^type.value()) < types;
 	}
-	
+
 	public boolean isOneOfThese(Type...type){
 		for(Type t:type){
 			if(is(t)) return true;
 		}
 		return false;
 	}
-	
-	
+
+
 	@Override
 	public int compareTo(Event o) {
 		return (symbol+"."+types).compareTo(o.symbol+"."+o.types);
 	}
-	
+
 	/**
 	 * Handler method needs IDyanmi as only mandatory parameter
 	 * @author Atria
@@ -70,32 +70,32 @@ public class Event implements Comparable<Event> {
 		Type type() default Type.OnBarClose;
 		String symbol() default "*";
 	}
-	
-	
+
+
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
 	public static @interface OnBarOpen {
 		String[] symbol() default "*";
 	}
-	
+
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
 	public static @interface OnDayOpen {
 		String[] symbol() default "*";
 	}
-	
+
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
 	public static @interface OnDayClose {
 		String[] symbol() default "*";
 	}
-	
+
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
 	public static @interface OnTick {
 		String[] symbol() default "*";
 	}
-	
+
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
 	public static @interface OnBarClose {
@@ -103,7 +103,7 @@ public class Event implements Comparable<Event> {
 		/**
 		 * Defines bar time frame using the following notation:<b>[number]*[unit symbol]</b><br>
 		 * E.g. <b>5*m</b> stands for 5 minutes time frame<br>
-		 * 
+		 *
 		 * Useful unit symbols are:<br>
 		 * <ul>
 		 * <li><b>s</b>: stands for second</li>
@@ -113,36 +113,36 @@ public class Event implements Comparable<Event> {
 		 * <li><b>W</b>: stands for week</li>
 		 * <li><b>M</b>: stands for month</li>
 		 * </ul>
-		 * 
-		 * 
+		 *
+		 *
 		 * @return
 		 */
 		//String timeFrame() default "1*m";
 	}
-	
+
 	public static enum Type {
 		OnBarClose(1),
 		OnBarOpen(2),
 		OnDayClose(4),
 		OnDayOpen(8),
 		OnTick(16);
-		
+
 		private final int idx;
 		Type(int i){
 			idx = i;
 		}
-		
+
 		int value() {
 			return idx;
 		}
 	}
-	
+
 	public final static class Factory {
 		private static final AtomicLong count = new AtomicLong(0L);
 		public static Event create(String symbol, Bar bar, Type...type){
 			return new Event(count.incrementAndGet(), symbol, bar, null, type);
 		}
-		
+
 		public static Event create(String symbol, Book.Orders item){
 			return new Event(count.incrementAndGet(), symbol, null, item, Type.OnTick);
 		}
