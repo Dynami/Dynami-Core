@@ -125,7 +125,8 @@ public class Event implements Comparable<Event> {
 		OnBarOpen(2),
 		OnDayClose(4),
 		OnDayOpen(8),
-		OnTick(16);
+		OnTick(16),
+		NoMoreData(32);
 
 		private final int idx;
 		Type(int i){
@@ -139,12 +140,17 @@ public class Event implements Comparable<Event> {
 
 	public final static class Factory {
 		private static final AtomicLong count = new AtomicLong(0L);
+
 		public static Event create(String symbol, Bar bar, Type...type){
 			return new Event(count.incrementAndGet(), symbol, bar, null, type);
 		}
 
 		public static Event create(String symbol, Book.Orders item){
 			return new Event(count.incrementAndGet(), symbol, null, item, Type.OnTick);
+		}
+
+		public static Event noMoreDataEvent(String symbol){
+			return new Event(count.incrementAndGet(), symbol, null, null, Type.NoMoreData);
 		}
 	}
 }
