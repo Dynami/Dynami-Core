@@ -15,6 +15,7 @@
  */
 package org.dynami.core.orders;
 
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.dynami.core.assets.Book;
@@ -30,6 +31,7 @@ public class OrderRequest {
 	public final String note;
 	public final IOrderService.IOrderHandler handler;
 	public final AtomicReference<IOrderService.Status> status = new AtomicReference<IOrderService.Status>(IOrderService.Status.Pending);
+	public final AtomicLong executionTime = new AtomicLong(0L);
 
 	public OrderRequest(int id, long time, String symbol, long quantity, double price, String note, IOrderService.IOrderHandler handler){
 		this.time = time;
@@ -43,6 +45,14 @@ public class OrderRequest {
 
 	public void updateStatus(IOrderService.Status status){
 		this.status.set(status);
+	}
+	
+	public void setExecutionTime(long time){
+		executionTime.set(time);
+	}
+	
+	public long getExecutionTime(){
+		return executionTime.get();
 	}
 
 	public long getId() {
