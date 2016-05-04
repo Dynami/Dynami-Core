@@ -14,6 +14,7 @@ Export-Package: org.dynami.core,
  org.dynami.core.descriptors,
  org.dynami.core.orders,
  org.dynami.core.orders.cond,
+ org.dynami.core.plot,
  org.dynami.core.portfolio,
  org.dynami.core.services,
  org.dynami.core.utils

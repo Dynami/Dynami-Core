@@ -25,6 +25,7 @@ import org.dynami.core.assets.Book;
 import org.dynami.core.data.Bar;
 
 public class Event implements Comparable<Event> {
+	public final long time;
 	public final long id;
 	public final String symbol;
 	public final int types;
@@ -37,6 +38,7 @@ public class Event implements Comparable<Event> {
 		this.bar = bar;
 		this.item = item;
 		int sum = 0;
+		this.time = (bar != null)?bar.time:item.time;
 		for(Type t:type){
 			sum |= t.value();
 		}

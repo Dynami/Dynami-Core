@@ -62,7 +62,7 @@ public interface IPortfolioService {
 	public double requiredMargin();
 
 	public Collection<ExecutedOrder> executedOrders();
-
+	
 	public Greeks getPortfolioGreeks();
 
 	public static class Greeks{
