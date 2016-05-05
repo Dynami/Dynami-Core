@@ -38,7 +38,7 @@ public class Event implements Comparable<Event> {
 		this.bar = bar;
 		this.item = item;
 		int sum = 0;
-		this.time = (bar != null)?bar.time:item.time;
+		this.time = (type != null && type.length > 0 && type[0].equals(Type.NoMoreData))?0:((bar != null)?bar.time:item.time);
 		for(Type t:type){
 			sum |= t.value();
 		}
