@@ -27,7 +27,7 @@ public @interface Plot {
 	String name() default "";
 	Type type() default Type.Line;
 	LineType lineType() default LineType.Solid;
-	String color() default "";
+	Colors color() default Colors.NONE;
 	
 	public static enum Type {
 		Line, Bar
