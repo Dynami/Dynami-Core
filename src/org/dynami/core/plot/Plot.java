@@ -1,4 +1,5 @@
 /*
+
  * Copyright 2016 Alessandro Atria - a.atria@gmail.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +28,7 @@ public @interface Plot {
 	String name() default "";
 	Type type() default Type.Line;
 	LineType lineType() default LineType.Solid;
-	Colors color() default Colors.NONE;
+	String color() default Colors.BLACK; // BLACK
 	
 	public static enum Type {
 		Line, Bar
