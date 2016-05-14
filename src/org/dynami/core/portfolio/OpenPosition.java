@@ -33,6 +33,14 @@ public class OpenPosition {
 		this.currentTime = currentTime;
 	}
 	
+	public double getEntryPrice() {
+		return entryPrice;
+	}
+	
+	public double performance(){
+		return (quantity>0)?(getCurrentPrice()/entryPrice)-1:(entryPrice/getCurrentPrice())-1;
+	}
+	
 	public void setCurrentTime(long currentTime) {
 		this.currentTime = currentTime;
 	}
