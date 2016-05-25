@@ -32,13 +32,13 @@ public class Event implements Comparable<Event> {
 	public final Bar bar;
 	public final Book.Orders item;
 
-	private Event(long id, String symbol, Bar bar, Book.Orders item, Type...type) {
+	private Event(long id, long time, String symbol, Bar bar, Book.Orders item, Type...type) {
 		this.id = id;
 		this.symbol = symbol;
 		this.bar = bar;
 		this.item = item;
 		int sum = 0;
-		this.time = (type != null && type.length > 0 && type[0].equals(Type.NoMoreData))?0:((bar != null)?bar.time:item.time);
+		this.time = time; //(type != null && type.length > 0 && type[0].equals(Type.NoMoreData))?0:((bar != null)?bar.time:item.time);
 		for(Type t:type){
 			sum |= t.value();
 		}
@@ -143,16 +143,18 @@ public class Event implements Comparable<Event> {
 	public final static class Factory {
 		private static final AtomicLong count = new AtomicLong(0L);
 
-		public static Event create(String symbol, Bar bar, Type...type){
-			return new Event(count.incrementAndGet(), symbol, bar, null, type);
+		public static Event create(String symbol, long time, Bar bar, Type...type){
+			return new Event(count.incrementAndGet(), time, symbol, bar, null, type);
 		}
 
 		public static Event create(String symbol, Book.Orders item){
-			return new Event(count.incrementAndGet(), symbol, null, item, Type.OnTick);
+			long time = item.time;
+			return new Event(count.incrementAndGet(), time, symbol, null, item, Type.OnTick);
 		}
 
 		public static Event noMoreDataEvent(String symbol){
-			return new Event(count.incrementAndGet(), symbol, null, null, Type.NoMoreData);
+			long time = 0L;
+			return new Event(count.incrementAndGet(), time, symbol, null, null, Type.NoMoreData);
 		}
 	}
 }
