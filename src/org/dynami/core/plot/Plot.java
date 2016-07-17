@@ -29,9 +29,10 @@ public @interface Plot {
 	Type type() default Type.Line;
 	LineType lineType() default LineType.Solid;
 	String color() default Colors.BLACK; // BLACK
-	
+	String positive() default Colors.GREEN;
+	String negative() default Colors.RED;
 	public static enum Type {
-		Line, Bar
+		Line, Bar, OHLC
 	}
 	
 	public static enum LineType {

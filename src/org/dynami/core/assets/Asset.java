@@ -228,8 +228,13 @@ public abstract class Asset implements Comparable<Asset> {
 //			volatility = vola;
 //		}
 
+		
 		public Exercise getExercise(){
 			return exercise;
+		}
+		
+		public double getTemporalValue(double price){
+			return lastPrice()-getValueAtExpiration(price);
 		}
 
 		public double getValueAtExpiration(double price){
@@ -248,7 +253,7 @@ public abstract class Asset implements Comparable<Asset> {
 			double upper = price*(1+requiredMargin);
 			double lower = price*(1-requiredMargin);
 
-			double initial = entryPrice*quantity*pointValue*((quantity>0)?-1:1);
+			double initial = entryPrice*quantity*pointValue*-1;
 
 			double upperValue = getValueAt(upper, DTime.Clock.getTime(), pricingEngine)*quantity*pointValue+initial;
 			double lowerValue = getValueAt(lower, DTime.Clock.getTime(), pricingEngine)*quantity*pointValue+initial;

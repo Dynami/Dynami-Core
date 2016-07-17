@@ -18,6 +18,7 @@ package org.dynami.core.services;
 import java.util.Date;
 
 import org.dynami.core.data.IData;
+import org.dynami.core.data.IVolatilityEngine;
 
 public interface IDataService {
 	public static final String ID = "IDataService";
@@ -57,5 +58,22 @@ public interface IDataService {
 	 * @return {@link IData}
 	 */
 	public IData history(String symbol, Date from, Date to, long timeFrame, int units);
+	
+	/**
+	 * Gets annualized historical volatility
+	 * @param symbol
+	 * @param units
+	 * @return annualized historica volatility
+	 */
+	public double histVola(String symbol, int units);
+	
+	/**
+	 * Gets annualized historical volatility computed by given volatility estimator
+	 * @param engine
+	 * @param symbol
+	 * @param units
+	 * @return
+	 */
+	public double histVola(IVolatilityEngine engine, String symbol, int units);
 	
 }

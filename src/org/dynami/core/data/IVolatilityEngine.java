@@ -24,6 +24,12 @@ import org.dynami.core.utils.DUtils;
 public interface IVolatilityEngine {	
 	public double compute(IData data, int period);
 	
+	public default double annualizationFactor(long compresssionRate, int period){
+		double factor = DUtils.YEAR_WORKDAYS;
+		factor = ((IData.TimeUnit.Day.millis() / (double)compresssionRate) * DUtils.YEAR_WORKDAYS)/period;
+		return Math.sqrt(factor);
+	}
+	
 	public default double annualizationFactor(long compresssionRate, int period, Market market){
 		double factor = DUtils.YEAR_WORKDAYS;
 		if (compresssionRate >= IData.TimeUnit.Day.millis()) {

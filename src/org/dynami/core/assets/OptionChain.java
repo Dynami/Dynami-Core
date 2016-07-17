@@ -133,6 +133,12 @@ public class OptionChain {
 		} while(true);
 		return idx;
 	}
+	
+	public Asset.Option strike(Asset.Option opt, int numberOfStrikes){
+		final OptionRecord[] items = getByExpire(opt.expire, opt.type);
+		final int idx = searchIndexByStrike(items, DUtils.d2l(opt.strike));
+		return (idx >= 0 && idx+numberOfStrikes >= 0 && idx+numberOfStrikes < items.length)?items[idx+numberOfStrikes].option:null;
+	}
 
 	public Asset.Option upperStrike(Asset.Option opt, int numberOfStrikes){
 		final OptionRecord[] items = getByExpire(opt.expire, opt.type);
