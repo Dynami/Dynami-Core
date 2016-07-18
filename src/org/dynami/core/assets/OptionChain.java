@@ -180,6 +180,10 @@ public class OptionChain {
 		options.add(new OptionRecord(opt.expire, DUtils.d2l(opt.strike), opt.type, opt));
 		expirations.add(opt.expire);
 	}
+	
+	public Asset.Option getOption(double price, Asset.Option.Type type){
+		return getOptionAtPrice(expirations.first(), type, price);
+	}
 
 	public Asset.Option getCall(double price){
 		return getOptionAtPrice(expirations.first(), Asset.Option.Type.CALL, price);

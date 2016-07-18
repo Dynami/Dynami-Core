@@ -48,6 +48,10 @@ public class Event implements Comparable<Event> {
 	public boolean is(Type type){
 		return (types^type.value()) < types;
 	}
+	
+	public boolean isNot(Type type){
+		return !((types^type.value()) < types);
+	}
 
 	public boolean isOneOfThese(Type...type){
 		for(Type t:type){
