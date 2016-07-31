@@ -36,9 +36,9 @@ import org.dynami.core.services.ITraceService;
  */
 public interface IDynami {
 	
-	public void gotoNextStage(final IStage nextStage) throws Exception;
+	public void gotoNextStage(final IStage nextStage);
 	
-	public void gotoNextStageNow(final IStage nextStage) throws Exception;
+	public void gotoNextStageNow(final IStage nextStage);
 	
 	/**
 	 * After processing iteration strategy execution is stopped, even if there are other scheduled stages.
