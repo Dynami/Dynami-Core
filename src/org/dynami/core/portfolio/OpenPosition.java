@@ -46,6 +46,9 @@ public class OpenPosition {
 	}
 	
 	public double getCurrentPrice(){
+		if(asset.is(Asset.Family.Option)){
+			asset.as(Asset.Option.class).reqForQuot();
+		}
 		return (quantity > 0)?asset.book.bid().price:asset.book.ask().price;
 	}
 	

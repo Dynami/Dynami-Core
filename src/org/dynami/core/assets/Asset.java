@@ -16,6 +16,7 @@
 package org.dynami.core.assets;
 
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.dynami.core.data.IPricingEngine;
 import org.dynami.core.utils.DTime;
@@ -181,6 +182,7 @@ public abstract class Asset implements Comparable<Asset> {
 		public static enum Type { CALL, PUT }
 		public static enum Exercise {European, American}
 		public final IPricingEngine pricingEngine;
+		private final Function<Option, Boolean> quotationFunction; 
 
 		public Option(String symbol, String isin, String name, double pointValue, double tick,
 				double requiredMargin,
@@ -189,7 +191,8 @@ public abstract class Asset implements Comparable<Asset> {
 				double strike, Type type,  Exercise exercise,
 				Greeks.Engine greeksEngine,
 				Greeks.ImpliedVolatility implVola,
-				IPricingEngine pricingEngine){
+				IPricingEngine pricingEngine,
+				Function<Option, Boolean> quotationFunction){
 			super(Family.Option, symbol, isin, name, pointValue, tick, market, requiredMargin, lastPriceEngine, expire, lotSize, underlyingAsset, riskFreeRate);
 			this.strike = strike;
 			this.type = type;
@@ -197,6 +200,7 @@ public abstract class Asset implements Comparable<Asset> {
 			this.implVola = implVola;
 			this.exercise = exercise;
 			this.pricingEngine = pricingEngine;
+			this.quotationFunction = quotationFunction;
 
 			book.addBookListener((ask, bid)->{
 				if(ask != null && bid != null){
@@ -233,6 +237,10 @@ public abstract class Asset implements Comparable<Asset> {
 			return exercise;
 		}
 		
+		public boolean reqForQuot(){
+			return quotationFunction.apply(this);
+		}
+		
 		public double getTemporalValue(double price){
 			return lastPrice()-getValueAtExpiration(price);
 		}
@@ -244,7 +252,7 @@ public abstract class Asset implements Comparable<Asset> {
 				return Math.max(strike-price, 0);
 			}
 		}
-
+		
 		public double fairValue(){
 			return pricingEngine.compute(this, DTime.Clock.getTime(), underlyingAsset.asTradable().lastPrice(), volatility, riskFreeRate.get());
 		}
