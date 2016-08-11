@@ -47,6 +47,14 @@ public interface IDataService {
 	 * @return {@link IData}
 	 */
 	public IData history(String symbol, Date from, Date to);
+	
+	/**
+	 * Retrieves last n bars
+	 * @param symbol
+	 * @param last
+	 * @return {@link IData}
+	 */
+	public IData history(String symbol, int last);
 
 	/**
 	 * Retrieves the historical data for the given range with the desired compression for the given symbol
