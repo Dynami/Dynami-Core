@@ -82,4 +82,7 @@ public class Market {
 	public void setCloseTime(LocalTime closeTime) {
 		this.closeTime = closeTime;
 	}
+	
+	public final static Market IT_IDEM = new Market("IDEM", "IDEM", Locale.ITALY, LocalTime.of(9, 0, 0), LocalTime.of(17, 25, 0));
+	
 }
