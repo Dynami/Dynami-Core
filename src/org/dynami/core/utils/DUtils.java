@@ -117,6 +117,21 @@ public class DUtils {
 		return out;
 	}
 	
+	public static double min(double ...ds){
+		double out = Long.MAX_VALUE;
+		for(double d : ds){
+			if(d < out)
+				out = d;
+		}
+		return out;
+	}
+	
+	public static double[] repeat(double v, int n){
+		double[] out = new double[n];
+		Arrays.fill(out, v);
+		return out;
+	}
+	
 	@SafeVarargs
 	public static <T> boolean in(T in, T...compare){
 		for(T n:compare){
@@ -214,7 +229,7 @@ public class DUtils {
 	}
 	
 	/**
-	 * //p = c – S + Xe – r(T-t)
+	 * //p = c ï¿½ S + Xe ï¿½ r(T-t)
 	 * @return
 	 */
 	public static double putPrice(double callPrice, double spotPrice, double strike, double maturity, double riskFreeRate){

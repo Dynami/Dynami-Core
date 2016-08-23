@@ -103,31 +103,38 @@ public abstract class Asset implements Comparable<Asset> {
 			double margin = Math.abs(price*requiredMargin*quantity*pointValue);
 			return new Margin(
 					((quantity>0)?-1:1)*margin,
+					0,
 					((quantity<0)?-1:1)*margin
 					);
 		}
 
 		public static class Margin {
 			private double upper = 0;
+			private double middle = 0;
 			private double lower = 0;
 			public Margin(){}
-			public Margin(double lower, double upper){
+			public Margin(double lower,  double middle, double upper){
 				this.upper = upper;
+				this.middle = middle;
 				this.lower = lower;
 			}
 			public double getUpper() {
 				return upper;
+			}
+			public double getMiddle() {
+				return middle;
 			}
 			public double getLower() {
 				return lower;
 			}
 
 			public double required(){
-				return Math.min(upper, lower);
+				return Math.min(middle, Math.min(upper, lower));
 			}
 
 			public void merge(Margin o){
 				this.upper += o.upper;
+				this.middle += o.middle;
 				this.lower += o.lower;
 			}
 		}
@@ -263,9 +270,10 @@ public abstract class Asset implements Comparable<Asset> {
 			double initial = entryPrice*quantity*pointValue*-1;
 
 			double upperValue = getValueAt(upper, DTime.Clock.getTime(), pricingEngine)*quantity*pointValue+initial;
+			double middleValue = getValueAt(price, DTime.Clock.getTime(), pricingEngine)*quantity*pointValue+initial;
 			double lowerValue = getValueAt(lower, DTime.Clock.getTime(), pricingEngine)*quantity*pointValue+initial;
 
-			return new Margin(lowerValue, upperValue);
+			return new Margin(lowerValue, middleValue, upperValue);
 		}
 
 		@Override

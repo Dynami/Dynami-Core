@@ -76,6 +76,8 @@ public class Series implements Cloneable, Iterable<Double> {
 //		return data[cursor-1];
 		return stats.getElement(cursor-1);
 	}
+	
+	
 
 	public double last(int retro){
 		assert cursor - retro < 1 : "No data!";
@@ -124,7 +126,41 @@ public class Series implements Cloneable, Iterable<Double> {
 			}
 		};
 	}
-
+	
+	public static double[] rollapply(double[] data, Function<double[], Double> func, int windowSize){
+		double[] out = new double[data.length];
+		double[] tmp;
+		for(int i = 0; i < data.length; i++){
+			if(i < windowSize-1){
+				out[i] = Double.NaN;
+			} else {
+				tmp = new double[windowSize];
+				System.arraycopy(data, i-(windowSize-1), tmp, 0, windowSize);
+				out[i] = func.apply(tmp);
+			}
+		}
+		return out;
+	}
+	
+	public Series rollapply(Function<double[], Double> func, int windowSize){
+		return new Series(rollapply(toArray(), func, windowSize));
+	}
+	
+	public Series rollapply2(Function<Series, Double> func, int windowSize) {
+		final Series out = new Series();
+		final int size = size();
+		for(int i = 0; i < size; i++){
+			if(i < windowSize-1){
+				out.append(Double.NaN);
+			} else {
+				System.out.println("Series.rollapply2() "+(i-windowSize+1)+" - "+(i));
+				Series s = subset(i-windowSize+1, i);
+				out.append(func.apply(s));
+			}
+		}
+		return out;
+	}
+	
 	private Series math(Function<Double, Double> operand){
 		int _innerlength = size();
 		Series _new = new Series();
