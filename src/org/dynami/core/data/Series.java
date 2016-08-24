@@ -142,18 +142,17 @@ public class Series implements Cloneable, Iterable<Double> {
 		return out;
 	}
 	
-	public Series rollapply(Function<double[], Double> func, int windowSize){
+	public Series rollapplyForArrays(Function<double[], Double> func, int windowSize){
 		return new Series(rollapply(toArray(), func, windowSize));
 	}
 	
-	public Series rollapply2(Function<Series, Double> func, int windowSize) {
+	public Series rollapply(Function<Series, Double> func, int windowSize) {
 		final Series out = new Series();
 		final int size = size();
 		for(int i = 0; i < size; i++){
 			if(i < windowSize-1){
 				out.append(Double.NaN);
 			} else {
-				System.out.println("Series.rollapply2() "+(i-windowSize+1)+" - "+(i));
 				Series s = subset(i-windowSize+1, i);
 				out.append(func.apply(s));
 			}

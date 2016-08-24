@@ -12,7 +12,7 @@ public class SeriesTest {
 			
 			Series s = new Series(_data);
 //			Series s1 = s.rollapply(DUtils::min, 3);
-			Series s2 = s.rollapply2(Series::min, 3);
+			Series s2 = s.rollapply(Series::min, 3);
 //			double[] out1 = Series.rollapply(_data, DUtils::min, 3);
 			System.out.println(s.size()+ " - "+s2.size());
 			System.out.println(s);
