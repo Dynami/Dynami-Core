@@ -209,12 +209,13 @@ public abstract class Asset implements Comparable<Asset> {
 //			this.quotationFunction = quotationFunction;
 
 			book.addBookListener((ask, bid)->{
-				if(ask != null && bid != null){
+				if(ask != null && bid != null && ask.price > 0 && bid.price > 0){
 					double rf = riskFreeRate.get();
-					double optionMidPrice = lastPriceEngine.apply(bid, ask);
 					long time = Math.max(ask.time, bid.time);
-					volatility = implVola.estimate(underlyingAsset.symbol, time, type, expire, strike, optionMidPrice, rf);
-					greeksEngine.evaluate(greeks, underlyingAsset.symbol, time, type, expire, strike,  volatility, rf);
+					volatility = implVola.estimate(underlyingAsset.symbol, time, type, expire, strike, lastPriceEngine.apply(bid, ask), rf);
+					if(volatility > 0) {
+						greeksEngine.evaluate(greeks, underlyingAsset.symbol, time, type, expire, strike,  volatility, rf);
+					}
 				}
 			});
 		}
