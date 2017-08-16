@@ -23,7 +23,7 @@ import org.dynami.core.services.IOrderService;
 import org.dynami.core.utils.DUtils;
 
 public class OrderRequest {
-	public final int id;
+	public final long id;
 	public final long time;
 	public final String symbol;
 	public final double price;
@@ -33,7 +33,7 @@ public class OrderRequest {
 	public final AtomicReference<IOrderService.Status> status = new AtomicReference<IOrderService.Status>(IOrderService.Status.Pending);
 	public final AtomicLong executionTime = new AtomicLong(0L);
 
-	public OrderRequest(int id, long time, String symbol, long quantity, double price, String note, IOrderService.IOrderHandler handler){
+	public OrderRequest(long id, long time, String symbol, long quantity, double price, String note, IOrderService.IOrderHandler handler){
 		this.time = time;
 		this.symbol = symbol;
 		this.price = price;

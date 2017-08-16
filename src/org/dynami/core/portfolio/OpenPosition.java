@@ -41,6 +41,10 @@ public class OpenPosition {
 		return (quantity>0)?(getCurrentPrice()/entryPrice)-1:(entryPrice/getCurrentPrice())-1;
 	}
 	
+	public double getCurrentValue() {
+		return (getCurrentPrice()-entryPrice)*quantity*asset.pointValue;
+	}
+	
 	public void setCurrentTime(long currentTime) {
 		this.currentTime = currentTime;
 	}

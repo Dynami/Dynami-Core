@@ -51,11 +51,11 @@ public interface IPortfolioService {
 
 	public List<ClosedPosition> getClosedPositions(String symbol);
 
-	public double realised();
+	public double realized();
 
-	public double unrealised(String symbol);
+	public double unrealized(String symbol);
 
-	public double unrealised();
+	public double unrealized();
 
 	public double commissions();
 

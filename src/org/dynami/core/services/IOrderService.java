@@ -94,21 +94,21 @@ public interface IOrderService {
 	 * @param id
 	 * @return requested order request
 	 */
-	public OrderRequest getOrderById(int id);
+	public OrderRequest getOrderById(long id);
 
 	/**
 	 * Retrieves the order request status
 	 * @param id
 	 * @return
 	 */
-	public Status getOrderStatus(int id);
+	public Status getOrderStatus(long id);
 
 	/**
 	 * Sends a cancel signal for a previous order request
 	 * @param id order request unique identifier
 	 * @return true if the order request can be removed, false otherwise
 	 */
-	public boolean cancelOrder(int id);
+	public boolean cancelOrder(long id);
 
 	/**
 	 * Retrieve the list of pending order requests, whether there are not pending order request, the method retrieves an empty list.
@@ -130,7 +130,7 @@ public interface IOrderService {
 	public boolean thereArePendingOrders(String symbol);
 
 	/**
-	 * L'interfaccia definisce i metodi che la callback di un ordine eseguito in modalità asincrona
+	 * L'interfaccia definisce i metodi che la callback di un ordine eseguito in modalitï¿½ asincrona
 	 * deve implementare.
 	 * <pre>
 	 * Se si vuole definire un comportamento particolare all'esecuzione dell'ordine (ad esempio in caso di esecuzione dell'ordine
