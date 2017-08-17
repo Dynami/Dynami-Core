@@ -151,7 +151,7 @@ public class Event implements Comparable<Event> {
 			return new Event(count.incrementAndGet(), time, symbol, bar, null, type);
 		}
 
-		public static Event create(String symbol, Book.Orders item){
+		public static Event createOnTickEvent(String symbol, Book.Orders item){
 			long time = item.time;
 			return new Event(count.incrementAndGet(), time, symbol, null, item, Type.OnTick);
 		}
