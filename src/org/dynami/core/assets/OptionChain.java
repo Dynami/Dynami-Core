@@ -15,11 +15,13 @@
  */
 package org.dynami.core.assets;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.dynami.core.assets.Asset.Option;
 import org.dynami.core.utils.DTime;
@@ -171,6 +173,14 @@ public class OptionChain {
 		final int idx = searchIndexByExpire(items, opt.expire);
 		return (idx > 0 && idx < items.length)?items[idx-1].option:null;
 	}
+	
+	public List<Asset.Option> getCalls(long expire){
+		return getOptionByExpirationAndType(expire, Option.Type.CALL);
+	}
+	
+	public List<Asset.Option> getPuts(long expire){
+		return getOptionByExpirationAndType(expire, Option.Type.PUT);
+	}
 
 	public String getParentSymbol() {
 		return parentSymbol;
@@ -244,6 +254,16 @@ public class OptionChain {
 			return lower.option;
 		}
 	}
+	
+	private List<Asset.Option> getOptionByExpirationAndType(final long expire, final Asset.Option.Type type){
+		OptionRecord[] subset = options.stream()
+									.filter(o->o.expire == expire)
+									.filter(o->o.type.equals(type))
+									.sorted((o1, o2)-> Long.compare(o1.strike, o2.strike))
+									.toArray(OptionRecord[]::new);
+		
+		return Arrays.stream(subset).map(OptionRecord::getOption).collect(Collectors.toList());
+	}
 
 	private Asset.Option getOptionAtDelta(final long expire, final Asset.Option.Type type, final double delta){
 		OptionRecord[] subset = options.stream()
@@ -291,6 +311,10 @@ public class OptionChain {
 		@Override
 		public String toString() {
 			return option.toString();
+		}
+		
+		public Option getOption() {
+			return option;
 		}
 	}
 }

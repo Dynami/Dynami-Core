@@ -55,7 +55,7 @@ public interface IStage {
 	 * @see Event.Handler
 	 * @see IDynami
 	 */
-	public void process(final IDynami dynami, Event event);
+	public void process(final IDynami dynami, Event event) throws Exception;
 	
 	@Target({ElementType.METHOD})
 	@Retention(RetentionPolicy.RUNTIME)
