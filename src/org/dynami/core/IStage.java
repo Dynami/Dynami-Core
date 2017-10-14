@@ -41,8 +41,9 @@ public interface IStage {
 	 * Implement this method to setup params and stage variables.
 	 * The method is invoked once per stage.
 	 * @param dynami
+	 * @throws Exception 
 	 */
-	public void setup(final IDynami dynami);
+	public void setup(final IDynami dynami) throws Exception;
 	
 	/**
 	 * This method is the default event handler for all event type and all symbols.
