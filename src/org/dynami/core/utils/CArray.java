@@ -63,8 +63,32 @@ public class CArray {
 		return last(0);
 	}
 	
+	public double[] last(final int from, final int to) {
+		final int len = to-from;
+		assert len <= length : "Slice lenght greater than size array";
+		final double[] out = new double[len];
+		
+		for(int i = 0; i < len; i++) {
+			out[i] = last(from-i);
+		}
+		
+		return out;
+	}
+	
 	public double get(final int idx){
 		return data[(cursor<=length)?idx:(cursor+idx)%length];
+	}
+	
+	public double[] get(final int from, final int to) {
+		final int len = to-from;
+		assert len <= length : "Slice lenght greater than size array";
+		final double[] out = new double[len];
+		
+		for(int i = 0; i < len; i++) {
+			out[i] = get(from+i);
+		}
+		
+		return out;
 	}
 	
 	public double min(){
@@ -82,6 +106,26 @@ public class CArray {
 				min = d;
 		}
 		return min;
+	}
+	
+	public int argmin(int period){
+		assert period > 0;
+		double min = Double.MAX_VALUE;
+		double d = 0;
+		int size = Math.min(size(), period);
+		int minIdx = 0;
+		for(int i = 0; i < size ;i++){
+			d = get(i);
+			if(!Double.isNaN(d) && d < min) {
+				min = d;
+				minIdx = i;
+			}
+		}
+		return minIdx;
+	}
+	
+	public int argmin() {
+		return argmin(size());
 	}
 	
 	public int size(){
@@ -103,6 +147,26 @@ public class CArray {
 				max = d;
 		}
 		return max;
+	}
+	
+	public int argmax() {
+		return argmax(size());
+	}
+	
+	public int argmax(int period){
+		assert period > 0;
+		double max = -Double.MAX_VALUE;
+		double d = 0;
+		int size = Math.min(size(), period);
+		int maxIdx = 0;
+		for(int i = 0; i < size ;i++){
+			d = get(i);
+			if(!Double.isNaN(d) && d > max) {
+				max = d;
+				maxIdx = i;
+			}
+		}
+		return maxIdx;
 	}
 	
 	public double avg(int period){

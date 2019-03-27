@@ -31,12 +31,14 @@ public class Event implements Comparable<Event> {
 	public final int types;
 	public final Bar bar;
 	public final Book.Orders item;
+	public final double tick;
 
-	private Event(long id, long time, String symbol, Bar bar, Book.Orders item, Type...type) {
+	private Event(long id, long time, String symbol, Bar bar, Book.Orders item, double tick, Type...type) {
 		this.id = id;
 		this.symbol = symbol;
 		this.bar = bar;
 		this.item = item;
+		this.tick = tick;
 		int sum = 0;
 		this.time = time; //(type != null && type.length > 0 && type[0].equals(Type.NoMoreData))?0:((bar != null)?bar.time:item.time);
 		for(Type t:type){
@@ -132,7 +134,8 @@ public class Event implements Comparable<Event> {
 		OnDayClose(4),
 		OnDayOpen(8),
 		OnTick(16),
-		NoMoreData(32);
+		OnPriceChange(32),
+		NoMoreData(64);
 
 		private final int idx;
 		Type(int i){
@@ -148,17 +151,21 @@ public class Event implements Comparable<Event> {
 		private static final AtomicLong count = new AtomicLong(0L);
 
 		public static Event create(String symbol, long time, Bar bar, Type...type){
-			return new Event(count.incrementAndGet(), time, symbol, bar, null, type);
+			return new Event(count.incrementAndGet(), time, symbol, bar, null, 0, type);
 		}
 
-		public static Event createOnTickEvent(String symbol, Book.Orders item){
+		public static Event createOnPriceChangeEvent(String symbol, Book.Orders item){
 			long time = item.time;
-			return new Event(count.incrementAndGet(), time, symbol, null, item, Type.OnTick);
+			return new Event(count.incrementAndGet(), time, symbol, null, item, 0, Type.OnPriceChange);
+		}
+		
+		public static Event createOnTickEvent(String symbol, long time, double tick){
+			return new Event(count.incrementAndGet(), time, symbol, null, null, tick, Type.OnTick);
 		}
 
 		public static Event noMoreDataEvent(String symbol){
 			long time = 0L;
-			return new Event(count.incrementAndGet(), time, symbol, null, null, Type.NoMoreData);
+			return new Event(count.incrementAndGet(), time, symbol, null, null, 0, Type.NoMoreData);
 		}
 	}
 }

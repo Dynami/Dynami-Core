@@ -55,7 +55,14 @@ public class ClosedPosition {
 	@Override
 	public String toString() {
 		return "ClosedPosition [family="+family+", symbol=" + symbol + ", quantity=" +String.format("%3s", quantity) + ", entryPrice=" + String.format("%5.2f", entryPrice)
-				+ ", entryTime=" + DUtils.LONG_DATE_FORMAT.format(entryTime) + ", exitPrice=" + String.format("%5.2f", exitPrice) + ", exitTime=" + DUtils.LONG_DATE_FORMAT.format(exitTime) + ", pointValue="
+				+ ", entryTime=" + DUtils.LONG_DATE_FORMAT.format(entryTime) + ", exitPrice=" + DUtils.NUMBER_FORMAT.format(exitPrice) + ", exitTime=" + DUtils.LONG_DATE_FORMAT.format(exitTime) + ", pointValue="
 				+ pointValue + "] "+String.format("%5.2f", roi());
+	}
+	
+	public static String cvsHeader() {
+		return String.format("%10s\t%3s\t%10s\t%19s\t%10s\t%19s\t%7s", "symbol", "qty", "entryPrice", "entryTime", "exitPrice", "exitTime", "roi");
+	}
+	public String toCvs() {
+		return String.format("%10s\t%3s\t%10s\t%19s\t%10s\t%19s\t%5.2f", symbol, quantity, DUtils.NUMBER_FORMAT.format(entryPrice), DUtils.LONG_DATE_FORMAT.format(entryTime), DUtils.NUMBER_FORMAT.format(exitPrice), DUtils.LONG_DATE_FORMAT.format(exitTime), roi());
 	}
 }

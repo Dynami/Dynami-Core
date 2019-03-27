@@ -78,6 +78,25 @@ public class Bar implements Comparable<Bar> {
 
 	@Override
 	public String toString() {
-		return String.format("%10s\t%18s\tO:%8.2f\tH:%8.2f\tL:%8.2f\tC:%8.2f\tV:%12s\tOI:%12s", symbol, DUtils.LONG_DATE_FORMAT.format(time), open, high, low, close, volume, openInterest);
+		return String.format("%10s\t%18s\tO:%8.5f\tH:%8.5f\tL:%8.5f\tC:%8.5f", symbol, DUtils.LONG_DATE_FORMAT.format(time), open, high, low, close); //\tV:%12s\tOI:%12s , volume, openInterest
+	}
+	
+	public String toCsv(String delim, boolean newLine) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(symbol);
+		builder.append(delim);
+		builder.append(DUtils.LONG_DATE_FORMAT.format(time));
+		builder.append(delim);
+		builder.append(DUtils.NUMBER_FORMAT.format(open));
+		builder.append(delim);
+		builder.append(DUtils.NUMBER_FORMAT.format(high));
+		builder.append(delim);
+		builder.append(DUtils.NUMBER_FORMAT.format(low));
+		builder.append(delim);
+		builder.append(DUtils.NUMBER_FORMAT.format(close));
+		if(newLine)
+			builder.append('\n');
+		
+		return builder.toString();
 	}
 }

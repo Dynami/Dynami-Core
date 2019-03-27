@@ -145,6 +145,12 @@ public abstract class Asset implements Comparable<Asset> {
 			super(Family.Equity, symbol, isin, name, pointValue, tick, market, requiredMargin, lastPriceEngine);
 		}
 	}
+	
+	public static class CurrencyPair extends Tradable {
+		public CurrencyPair(String symbol, String name, double pointValue, double tick, double requiredMargin, Market market, final BiFunction<Book.Orders, Book.Orders, Double> lastPriceEngine) {
+			super(Family.Currency, symbol, "CURRENCY", name, pointValue, tick, market, requiredMargin, lastPriceEngine);
+		}
+	}
 
 	public static abstract class DerivativeInstr extends Tradable {
 //		public final String parentSymbol;
@@ -295,12 +301,13 @@ public abstract class Asset implements Comparable<Asset> {
 		}
 	}
 
+
 	@FunctionalInterface
 	public static interface RiskFreeRate {
 		public double get();
 	}
 
 	public enum Family{
-		Index, Equity, Future, Option;
+		Index, Equity, Future, Option, Currency;
 	}
 }

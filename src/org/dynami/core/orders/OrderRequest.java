@@ -15,6 +15,8 @@
  */
 package org.dynami.core.orders;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -32,8 +34,9 @@ public class OrderRequest {
 	public final IOrderService.IOrderHandler handler;
 	public final AtomicReference<IOrderService.Status> status = new AtomicReference<IOrderService.Status>(IOrderService.Status.Pending);
 	public final AtomicLong executionTime = new AtomicLong(0L);
+	public final List<IOrderCondition> conditions;
 
-	public OrderRequest(long id, long time, String symbol, long quantity, double price, String note, IOrderService.IOrderHandler handler){
+	public OrderRequest(long id, long time, String symbol, long quantity, double price, String note, IOrderService.IOrderHandler handler, IOrderCondition ...conditions){
 		this.time = time;
 		this.symbol = symbol;
 		this.price = price;
@@ -41,6 +44,7 @@ public class OrderRequest {
 		this.note = note;
 		this.id = id;
 		this.handler = handler;
+		this.conditions = Collections.unmodifiableList(List.of(conditions));
 	}
 
 	public void updateStatus(IOrderService.Status status){

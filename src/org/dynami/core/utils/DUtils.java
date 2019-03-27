@@ -35,8 +35,8 @@ public class DUtils {
 	public static final SimpleDateFormat LONG_DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
 	public static final DecimalFormat MONEY_FORMAT = new DecimalFormat("#,###.00");
-	public static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("#.###");
-	public static final DecimalFormat NUMBER_FORMAT = new DecimalFormat("#0.000");
+	public static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("#.####");
+	public static final DecimalFormat NUMBER_FORMAT = new DecimalFormat("#.######");
 	public static final List<OptionExpire> OPTION_EXPIRES = Collections.unmodifiableList(Arrays.asList(
 			new OptionExpire(0, 'A', 'M'),
 			new OptionExpire(1, 'B', 'N'),

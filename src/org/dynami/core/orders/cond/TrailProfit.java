@@ -20,38 +20,36 @@ import org.dynami.core.orders.OrderRequest.IOrderCondition;
 
 public class TrailProfit implements IOrderCondition {
 	private final double startTrail;
-	private double threshold, exitThreshold ;
+	private final double threshold;
+	private double exitThreshold ;
 	
-	
-	public TrailProfit(double startTrail, double trailPerc) {
+	public TrailProfit(double startTrail, double trail) {
 		this.startTrail = startTrail;
-		threshold = startTrail*(1+trailPerc);
-		exitThreshold = startTrail;
+		threshold = trail;
+		exitThreshold = startTrail-trail;
 	}
 
 	@Override
 	public boolean check(long quantity, Orders bid, Orders ask) {
 		if(quantity > 0 ){
-			if(threshold < bid.price){
-				exitThreshold += bid.price-threshold;
-				threshold = bid.price;
+			if(exitThreshold+threshold < bid.price){
+				exitThreshold = bid.price-threshold;
 			}
 		} else {
-			if(threshold > ask.price){
-				exitThreshold += ask.price-threshold;
-				threshold = ask.price;
+			if(exitThreshold-threshold > ask.price){
+				exitThreshold = ask.price-threshold;
 			}
 		}
 		
 		if(quantity > 0){
-			return (exitThreshold > startTrail && bid.price < exitThreshold);
+			return (exitThreshold > bid.price && startTrail < exitThreshold);
 		} else {
-			return (exitThreshold < startTrail && ask.price > exitThreshold);
+			return (exitThreshold < ask.price && startTrail > exitThreshold);
 		}
 	}
 	
 	@Override
 	public String toString() {
-		return "TrailProfit@"+String.format("%5.2f", threshold);
+		return "TrailProfit@"+String.format("%5.2f", exitThreshold);
 	}
 }

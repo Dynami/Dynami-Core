@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.dynami.core.IDynami;
 import org.dynami.core.orders.OrderRequest;
+import org.dynami.core.orders.OrderRequest.IOrderCondition;
 
 public interface IOrderService {
 	public static final String ID = "IOrderService";
@@ -72,7 +73,7 @@ public interface IOrderService {
 	 * @param note
 	 * @return order request unique identifier
 	 */
-	public long marketOrder(String symbol, long quantity, String note);
+	public long marketOrder(String symbol, long quantity, String note, IOrderCondition...conditions);
 
 	/**
 	 * Sends a market order
@@ -82,7 +83,7 @@ public interface IOrderService {
 	 * @param handler
 	 * @return order request unique identifier
 	 */
-	public long marketOrder(String symbol, long quantity, String note, IOrderHandler handler);
+	public long marketOrder(String symbol, long quantity, String note, IOrderHandler handler, IOrderCondition...conditions);
 
 	/**
 	 * Removes every pending orders and pending conditions such as stop loss or take profit
