@@ -30,15 +30,17 @@ public class Event implements Comparable<Event> {
 	public final String symbol;
 	public final int types;
 	public final Bar bar;
-	public final Book.Orders item;
-	public final double tick;
+	public final Book.Orders bid;
+	public final Book.Orders ask;
+	public final double price;
 
-	private Event(long id, long time, String symbol, Bar bar, Book.Orders item, double tick, Type...type) {
+	private Event(long id, long time, String symbol, Bar bar, Book.Orders bid, Book.Orders ask, double price, Type...type) {
 		this.id = id;
 		this.symbol = symbol;
 		this.bar = bar;
-		this.item = item;
-		this.tick = tick;
+		this.bid = bid;
+		this.ask = ask;
+		this.price = price;
 		int sum = 0;
 		this.time = time; //(type != null && type.length > 0 && type[0].equals(Type.NoMoreData))?0:((bar != null)?bar.time:item.time);
 		for(Type t:type){
@@ -151,21 +153,21 @@ public class Event implements Comparable<Event> {
 		private static final AtomicLong count = new AtomicLong(0L);
 
 		public static Event create(String symbol, long time, Bar bar, Type...type){
-			return new Event(count.incrementAndGet(), time, symbol, bar, null, 0, type);
+			return new Event(count.incrementAndGet(), time, symbol, bar, null, null, 0, type);
 		}
 
-		public static Event createOnPriceChangeEvent(String symbol, Book.Orders item){
-			long time = item.time;
-			return new Event(count.incrementAndGet(), time, symbol, null, item, 0, Type.OnPriceChange);
+		public static Event createOnPriceChangeEvent(String symbol, Book.Orders bid, Book.Orders ask){
+			long time = bid.time;
+			return new Event(count.incrementAndGet(), time, symbol, null, bid, ask, 0, Type.OnTick);
 		}
 		
-		public static Event createOnTickEvent(String symbol, long time, double tick){
-			return new Event(count.incrementAndGet(), time, symbol, null, null, tick, Type.OnTick);
+		public static Event createOnTickEvent(String symbol, long time, double price){
+			return new Event(count.incrementAndGet(), time, symbol, null, null, null, price, Type.OnPriceChange);
 		}
 
 		public static Event noMoreDataEvent(String symbol){
 			long time = 0L;
-			return new Event(count.incrementAndGet(), time, symbol, null, null, 0, Type.NoMoreData);
+			return new Event(count.incrementAndGet(), time, symbol, null, null, null, 0, Type.NoMoreData);
 		}
 	}
 }
