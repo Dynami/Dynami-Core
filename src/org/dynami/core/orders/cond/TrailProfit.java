@@ -19,37 +19,35 @@ import org.dynami.core.assets.Book.Orders;
 import org.dynami.core.orders.OrderRequest.IOrderCondition;
 
 public class TrailProfit implements IOrderCondition {
-	private final double startTrail;
-	private final double threshold;
-	private double exitThreshold ;
+	private final double entryPrice;
+	private final double trail;
+	private double exitLongPrice, exitShortPrice;
 	
-	public TrailProfit(double startTrail, double trail) {
-		this.startTrail = startTrail;
-		threshold = trail;
-		exitThreshold = startTrail-trail;
+	public TrailProfit(double entryPrice, double trail) {
+		this.entryPrice = entryPrice;
+		this.trail = trail;
+		this.exitLongPrice = entryPrice - trail;
+		this.exitShortPrice = entryPrice + trail;
 	}
 
 	@Override
 	public boolean check(long quantity, Orders bid, Orders ask) {
+		final double price = (quantity > 0) ? bid.price : ask.price;
 		if(quantity > 0 ){
-			if(exitThreshold+threshold < bid.price){
-				exitThreshold = bid.price-threshold;
+			if(exitLongPrice + trail < price){
+				exitLongPrice = price - trail;
 			}
+			return (entryPrice < exitLongPrice && exitLongPrice > price);
 		} else {
-			if(exitThreshold-threshold > ask.price){
-				exitThreshold = ask.price-threshold;
+			if(exitShortPrice - trail > price){
+				exitShortPrice = price - trail;
 			}
-		}
-		
-		if(quantity > 0){
-			return (exitThreshold > bid.price && startTrail < exitThreshold);
-		} else {
-			return (exitThreshold < ask.price && startTrail > exitThreshold);
+			return (entryPrice > exitShortPrice && exitShortPrice < price);
 		}
 	}
 	
 	@Override
 	public String toString() {
-		return "TrailProfit@"+String.format("%5.2f", exitThreshold);
+		return "TrailProfit@"+String.format("%5.2f", exitLongPrice);
 	}
 }
