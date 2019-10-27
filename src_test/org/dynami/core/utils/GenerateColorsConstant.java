@@ -1,7 +1,5 @@
 package org.dynami.core.utils;
 
-import java.lang.reflect.Field;
-
 //import javafx.scene.paint.Color;
 
 public class GenerateColorsConstant {

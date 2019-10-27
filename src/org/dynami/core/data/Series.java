@@ -291,6 +291,26 @@ public class Series implements Cloneable, Iterable<Double> {
 		assert size() < lastNvalues : "lastNvalues is bigger than size";
 		return last(lastNvalues) < last();
 	}
+	
+	public boolean goesStrictlyUp(int lastNvalues){
+		assert size() < lastNvalues : "lastNvalues is bigger than size";
+		for(int i = 1 ; i < lastNvalues; i++) {
+			if(last(i-1) < last(i)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public boolean goesStrictlyDown(int lastNvalues){
+		assert size() < lastNvalues : "lastNvalues is bigger than size";
+		for(int i = 1 ; i < lastNvalues; i++) {
+			if(last(i-1) > last(i)){
+				return false;
+			}
+		}
+		return true;
+	}
 
 
 	public boolean goesDown(int lastNvalues){
@@ -322,18 +342,26 @@ public class Series implements Cloneable, Iterable<Double> {
 	}
 
 	public boolean crossesOver(Series s2){
+		if(size() < 2) return false;
+		
 		return last(1) <= s2.last(1) && last() > s2.last();
 	}
 
 	public boolean crossesOver(double threshold){
+		if(size() < 2) return false;
+		
 		return last(1) <= threshold && last() > threshold;
 	}
 
 	public boolean crossesUnder(Series s2){
+		if(size() < 2) return false;
+		
 		return last(1) >= s2.last(1) && last() < s2.last();
 	}
 
 	public boolean crossesUnder(double threshold){
+		if(size() < 2) return false;
+		
 		return last(1) >= threshold && last() < threshold;
 	}
 

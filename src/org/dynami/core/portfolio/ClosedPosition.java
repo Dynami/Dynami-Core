@@ -59,10 +59,29 @@ public class ClosedPosition {
 				+ pointValue + "] "+String.format("%5.2f", roi());
 	}
 	
-	public static String cvsHeader() {
-		return String.format("%10s\t%3s\t%10s\t%19s\t%10s\t%19s\t%7s", "symbol", "qty", "entryPrice", "entryTime", "exitPrice", "exitTime", "roi");
+	public static String csvHeader() {
+		return csvHeader('\t');
 	}
-	public String toCvs() {
-		return String.format("%10s\t%3s\t%10s\t%19s\t%10s\t%19s\t%5.2f", symbol, quantity, DUtils.NUMBER_FORMAT.format(entryPrice), DUtils.LONG_DATE_FORMAT.format(entryTime), DUtils.NUMBER_FORMAT.format(exitPrice), DUtils.LONG_DATE_FORMAT.format(exitTime), roi());
+	
+	public static String csvHeader(char delim) {
+		return "symbol"+delim+"qty"+delim+"entryPrice"+delim+"entryTime"+delim+"exitPrice"+delim+"exitTime"+delim+"roi\n";
+	}
+	
+	public String toCsv() {
+		return toCsv('\t');
+	}
+	
+	public String toCsv(char delim) {
+		return symbol+delim+quantity+delim+DUtils.NUMBER_FORMAT.format(entryPrice)+delim+DUtils.LONG_DATE_FORMAT.format(entryTime)+delim+DUtils.NUMBER_FORMAT.format(exitPrice)+delim+DUtils.LONG_DATE_FORMAT.format(exitTime)+delim+roi()+"\n";
+	}
+	
+	public static String toPrettyPrintHeader() {
+		final char delim = '\t';
+		return String.format("%10s"+delim+"%3s"+delim+"%10s"+delim+"%19s"+delim+"%10s"+delim+"%19s"+delim+"%7s", "symbol", "qty", "entryPrice", "entryTime", "exitPrice", "exitTime", "roi");
+	}
+
+	public String toPrettyPrint() {
+		final char delim = '\t';
+		return String.format("%10s"+delim+"%3s"+delim+"%10s"+delim+"%19s"+delim+"%10s"+delim+"%19s"+delim+"%5.2f", symbol, quantity, DUtils.NUMBER_FORMAT.format(entryPrice), DUtils.LONG_DATE_FORMAT.format(entryTime), DUtils.NUMBER_FORMAT.format(exitPrice), DUtils.LONG_DATE_FORMAT.format(exitTime), roi());
 	}
 }

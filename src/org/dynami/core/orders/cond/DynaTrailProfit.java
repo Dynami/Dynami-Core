@@ -18,16 +18,28 @@ package org.dynami.core.orders.cond;
 import org.dynami.core.assets.Book.Orders;
 import org.dynami.core.orders.OrderRequest.IOrderCondition;
 
-public class TrailProfit implements IOrderCondition {
+public class DynaTrailProfit implements IOrderCondition {
 	private final double entryPrice;
 	private final double trail;
+	private double dynaTrail;
+	private final double DOWN_COEFF;
+	private final double UP_COEFF;
+	private final double MIN_TRAIL;
 	private double exitLongPrice, exitShortPrice;
 	
-	public TrailProfit(double entryPrice, double trail) {
+	public DynaTrailProfit(double entryPrice, double trail, double acceleration, double minTrail) {
 		this.entryPrice = entryPrice;
 		this.trail = trail;
+		this.dynaTrail = trail;
+		this.DOWN_COEFF =  1. - acceleration;
+		this.UP_COEFF = 1. + acceleration;
+		this.MIN_TRAIL = minTrail;
 		this.exitLongPrice = entryPrice - trail;
 		this.exitShortPrice = entryPrice + trail;
+	}
+	
+	public DynaTrailProfit(double entryPrice, double trail, double minTrail) {
+		this(entryPrice, trail, 0.1, minTrail);
 	}
 
 	@Override
@@ -41,13 +53,25 @@ public class TrailProfit implements IOrderCondition {
 //				((quantity > 0)? Math.max(entryPrice, exitLongPrice) : Math.min(entryPrice, exitShortPrice)) 
 //				));
 		if(quantity > 0 ){
-			if(exitLongPrice + trail < price){
-				exitLongPrice = price - trail;
+			if(exitLongPrice + dynaTrail < price){
+				dynaTrail *= UP_COEFF;
+				dynaTrail = Math.min(trail, dynaTrail);
+				
+				exitLongPrice = price - dynaTrail;
+			} else {
+				dynaTrail *= DOWN_COEFF;
+				dynaTrail = Math.max(MIN_TRAIL, dynaTrail);
 			}
 			return (entryPrice < exitLongPrice &&  Math.max(entryPrice, exitLongPrice) > price);
 		} else {
-			if(exitShortPrice - trail > price){
-				exitShortPrice = price + trail;
+			if(exitShortPrice - dynaTrail > price){
+				dynaTrail *= UP_COEFF;
+				dynaTrail = Math.min(trail, dynaTrail);
+				
+				exitShortPrice = price + dynaTrail;
+			} else {
+				dynaTrail *= DOWN_COEFF;
+				dynaTrail = Math.max(MIN_TRAIL, dynaTrail);
 			}
 			return (entryPrice > exitShortPrice &&  Math.min(entryPrice, exitShortPrice) < price);
 		}
@@ -55,6 +79,6 @@ public class TrailProfit implements IOrderCondition {
 	
 	@Override
 	public String toString() {
-		return "TrailProfit@"+String.format("%5.2f", exitLongPrice);
+		return "TrailProfit@"+String.format("%5.5f", exitLongPrice);
 	}
 }

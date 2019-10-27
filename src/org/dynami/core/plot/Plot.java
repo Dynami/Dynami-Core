@@ -27,7 +27,10 @@ public @interface Plot {
 	String on() default MAIN_CHART;
 	String name() default "";
 	Type type() default Type.Line;
+	
+	SymbolType symbolType() default SymbolType.None;
 	LineType lineType() default LineType.Solid;
+	
 	String color() default Colors.BLACK; // BLACK
 	String positive() default Colors.GREEN;
 	String negative() default Colors.RED;
@@ -36,7 +39,11 @@ public @interface Plot {
 	}
 	
 	public static enum LineType {
-		Solid, Dashed
+		Solid, Dashed, None
+	}
+	
+	public static enum SymbolType {
+		In, Out, None
 	}
 	
 	public static final String MAIN_CHART = "MainChart";

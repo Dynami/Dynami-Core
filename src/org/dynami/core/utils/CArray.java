@@ -179,6 +179,15 @@ public class CArray {
 		return sum/size;
 	}
 	
+	public double sum() {
+		final int len = size();
+		double sum = 0;
+		for(int i = 0; i < len; i++) {
+			sum += get(i);
+		}
+		return sum;
+	}
+	
 	public double avg(){
 		return avg(size());
 	}
@@ -224,6 +233,16 @@ public class CArray {
 		return slope(size());
 	}
 	
+	public double[] diff(int period) {
+		assert period > 0 && period < size();
+		
+		double[] out = new double[size() - period];
+		
+		for(int i = period; i < out.length; i++) {
+			out[i-period] = get(i) - get(i-period);
+		}
+		return out;
+	}
 	
 	public double std(final int period){
 		assert period > 0;
