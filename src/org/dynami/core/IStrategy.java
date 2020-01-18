@@ -22,4 +22,12 @@ public interface IStrategy {
 	public default void onStrategyStart(final IDynami dynami) throws Exception {};
 	
 	public default void onStrategyFinish(final IDynami dynami) throws Exception {};
+	
+	public static void closeAll(IDynami dynami){
+		dynami.portfolio().getOpenPositions().forEach(op->{
+			dynami.orders().marketOrder(op.asset.symbol, -op.quantity, "close all");
+		});
+
+		dynami.orders().removePendings();
+	}
 }

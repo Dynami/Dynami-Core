@@ -291,6 +291,10 @@ public abstract class Asset implements Comparable<Asset> {
 				return pricingEngine.compute(this, time, price, getVolatility(), riskFreeRate.get());
 			}
 		}
+		
+		public static boolean isValidDelta(double delta) {
+			return (delta >= -1 && delta <= 1);
+		}
 	}
 
 	public static class Future extends ExpiringInstr {
