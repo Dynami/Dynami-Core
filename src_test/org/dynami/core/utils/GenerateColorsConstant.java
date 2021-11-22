@@ -1,11 +1,11 @@
 package org.dynami.core.utils;
 
-import java.lang.reflect.Field;
+//import java.lang.reflect.Field;
 
 //import javafx.scene.paint.Color;
 
 public class GenerateColorsConstant {
-	public static void main(String[] args) {
+//	public static void main(String[] args) {
 //		try {
 //			Field[] fields = Color.class.getDeclaredFields();
 //			Color c = Color.ALICEBLUE;
@@ -19,7 +19,7 @@ public class GenerateColorsConstant {
 //		} catch (Exception e) {
 //			e.printStackTrace();
 //		}
-	}
+//	}
 	
 //	private static String format(Color c){
 //		return String.format( "#%02X%02X%02X",
