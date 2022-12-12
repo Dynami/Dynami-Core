@@ -140,20 +140,37 @@ public class CArray {
 	
 	public double slope(int period){
 		assert period > 0;
-		int size = Math.min(size(), period);
-		double mean_y = mean(size);
-		double mean_x = (size>1)?((size/2.0)+.5):1;
-		double summNum = 0;
+		final int size = Math.min(size(), period);
+		final double mean_y = mean(size);
+		final double mean_x = (size>1)?((size/2.0)+.5):1;
+		double sumNum = 0;
 		double sumDenom = 0;
 		double y = 0;
 		double x = 0;
 		for(int i = 0; i < size ;i++){
 			y = last(i);
 			x = (i+1);
-			summNum += (y-mean_y)*x;
+			sumNum += (y-mean_y)*x;
 			sumDenom += (x-mean_x)*x;
 		}
-		return -(summNum/sumDenom);
+		return -(sumNum/sumDenom);
+	}
+
+	public double _slope(int period){
+		assert period > 0;
+		final double epsilon = 1e-6;
+		final int size = Math.min(size(), period);
+		double sumNum = 0;
+		double sumDen = 0;
+		for(int i = 0; i < size; i++){
+			sumNum += (i+1)*get(i);
+			sumDen += Math.pow((i+1), 2.0);
+		}
+		return (sumNum+epsilon)/(sumDen+epsilon);
+	}
+
+	public double _slope(){
+		return _slope(size());
 	}
 	
 	public double slope(){
@@ -170,5 +187,13 @@ public class CArray {
 			sum += Math.pow(last(i)-avg, 2);
 		}
 		return Math.sqrt(sum/((double)size-1));
+	}
+
+	public CArray diff(){
+		CArray out = new CArray(this.length-1);
+		for(int i = 1; i < this.length; i++){
+			out.add(get(i-1)-get(i));
+		}
+		return out;
 	}
 }

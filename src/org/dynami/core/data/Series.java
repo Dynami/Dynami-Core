@@ -430,6 +430,21 @@ public class Series implements Cloneable, Iterable<Double> {
 		}
 	}
 
+	public Series concat(Series series, boolean inPlace){
+		if(inPlace) {
+			for(double v : series){
+				append(v);
+			}
+			return this;
+		} else {
+			Series out = clone();
+			for(double v : series){
+				out.append(v);
+			}
+			return out;
+		}
+	}
+
 	@Override
 	protected Series clone() {
 		Series copy = new Series();
