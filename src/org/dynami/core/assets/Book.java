@@ -25,11 +25,12 @@ import org.dynami.core.bus.IMsg;
 public class Book {
 	
 	private final int BOOK_DEEP = 5;
+	public static final int NONE = -1;
 	private transient final AtomicReferenceArray<Book.Orders> askSide = new AtomicReferenceArray<>(BOOK_DEEP);
 	private transient final AtomicReferenceArray<Book.Orders> bidSide = new AtomicReferenceArray<>(BOOK_DEEP);
 	
 	private final List<BiConsumer<Book.Orders, Book.Orders>> listeners = new ArrayList<>();
-	protected void addBookListener(BiConsumer<Book.Orders, Book.Orders> listener){
+	public void addBookListener(BiConsumer<Book.Orders, Book.Orders> listener){
 		listeners.add(listener);
 	}
 	
@@ -39,6 +40,18 @@ public class Book {
 			if(last && msg instanceof Orders){
 				Orders item = (Orders)msg;
 				askSide.set(item.level-1, item);
+				/*
+				if(item.price == NONE || item.quantity == NONE){
+					final Orders prev = askSide.get(item.level-1);
+					final double price = (item.price == -1)?prev.price : item.price;
+					final long quantity = (item.quantity == -1)?prev.quantity:item.quantity;
+					Orders newItem = new Orders(item.symbol, item.time, item.side, item.level, price, quantity);
+					askSide.set(newItem.level-1, newItem);
+
+				} else {
+					askSide.set(item.level-1, item);
+				}
+				*/
 				listeners.forEach(f->f.accept(ask(), bid()));
 			}
 		}
@@ -50,6 +63,18 @@ public class Book {
 			if(last && msg instanceof Orders){
 				Orders item = (Orders)msg;
 				bidSide.set(item.level-1, item);
+				/*
+				if(item.price == NONE || item.quantity == NONE){
+					final Orders prev = askSide.get(item.level-1);
+					final double price = (item.price == -1)?prev.price : item.price;
+					final long quantity = (item.quantity == -1)?prev.quantity:item.quantity;
+					Orders newItem = new Orders(item.symbol, item.time, item.side, item.level, price, quantity);
+					bidSide.set(newItem.level-1, newItem);
+
+				} else {
+					bidSide.set(item.level-1, item);
+				}
+				*/
 				listeners.forEach(f->f.accept(ask(), bid()));
 			}
 		}
