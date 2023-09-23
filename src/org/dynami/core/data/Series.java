@@ -18,6 +18,8 @@ package org.dynami.core.data;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.BiFunction;
+import java.util.function.DoubleBinaryOperator;
+import java.util.function.DoublePredicate;
 import java.util.function.Function;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -26,38 +28,38 @@ public class Series implements Cloneable, Iterable<Double> {
 //	private static final int BUFFER_SIZE = 100;
 //	private SummaryStatistics stats = new SummaryStatistics();
 //	private ResizableDoubleArray stats = new ResizableDoubleArray(BUFFER_SIZE);
-	private DescriptiveStatistics stats = new DescriptiveStatistics();
+	private final DescriptiveStatistics stats;
 //	private double[] data;
 	private int cursor;
 //	private double min, max;
 
+	public Series(int window){
+		stats = new DescriptiveStatistics(window);
+		clear();
+	}
+
 	public Series(){
+		stats = new DescriptiveStatistics();
 		clear();
 	}
 
 	public Series(double...values){
+		stats = new DescriptiveStatistics();
 		clear();
 		for(double d:values){
 			append(d);
 		}
 	}
 
-//	public double set(int idx, double v){
-//		stats.getValues();
-//		assert idx >= 0 && idx < cursor : "Out of range index";
-//		double tmp = data[idx];
-//		data[idx] = v;
-//		return tmp;
-//	}
+
+
+	private Series(int cursor, DescriptiveStatistics stats){
+		this.cursor = cursor;
+		this.stats = stats;
+	}
+
 
 	public void append(double d){
-//		if(cursor >= data.length){
-//			double[] tmp = new double[cursor+BUFFER_SIZE];
-//			System.arraycopy(data, 0, tmp, 0, cursor);
-//			data = tmp;
-//		}
-//		if(d > max) max = d;
-//		if(d < min) min = d;
 		stats.addValue(d);
 		cursor++;
 //		data[cursor++] = d;
@@ -65,10 +67,7 @@ public class Series implements Cloneable, Iterable<Double> {
 
 	public void clear(){
 		cursor = 0;
-//		data = new double[BUFFER_SIZE];
 		stats.clear();
-//		min = Long.MAX_VALUE;
-//		max = Long.MIN_VALUE;
 	}
 
 	public double last(){
@@ -360,6 +359,16 @@ public class Series implements Cloneable, Iterable<Double> {
 //		return out;
 	}
 
+	public float[] toFloatArray(){
+		double[] in = stats.getValues();
+		float[] out = new float[in.length];
+
+		for(int i = 0; i < in.length; i++){
+			out[i] = Double.valueOf(in[i]).floatValue();
+		}
+		return out;
+	}
+
 	public Series subset(int start, int end){
 		return new Series(toArray(start, end));
 	}
@@ -445,15 +454,75 @@ public class Series implements Cloneable, Iterable<Double> {
 		}
 	}
 
+	public double[][] reshape(int rows, int cols){
+		return reshape(this, rows, cols);
+	}
+
+	public static double[][] reshape(Series series, int rows, int cols){
+		final int len = cols * rows;
+		assert series.size() != len : "Data lenght and new shape are not compatible";
+
+		final double[][] output = new double[rows][cols];
+		for(int i = 0; i < len; i++){
+			output[i/cols][i%cols] = series.get(i);
+		}
+		return output;
+	}
+
+	public static double[][] merge(Series... series){
+		double[][] output = new double[series[0].size()][series.length];
+		for(int i = 0; i < series.length; i++){
+			for(int j = 0; j < series[i].size(); j++){
+				output[j][i] = series[i].get(j);
+			}
+		}
+		return output;
+	}
+
+	public static double[][] inline(double[][] data, int window){
+		int len = data.length;
+		int n_series = data[0].length;
+		int rows = len - window +1;
+		int cols = n_series * window;
+		double[][] output = new double[rows][cols];
+
+		for(int i = 0; i < rows; i++){
+			for(int c = 0; c < n_series; c++){
+				for(int r = 0; r < window; r++){
+					output[i][c*window+r] = data[i+r][c];
+				}
+			}
+		}
+		return output;
+	}
+
+	public static float[][] inline(float[][] data, int window){
+		int len = data.length;
+		int n_series = data[0].length;
+		int rows = len - window +1;
+		int cols = n_series * window;
+		float[][] output = new float[rows][cols];
+
+		for(int i = 0; i < rows; i++){
+			for(int c = 0; c < n_series; c++){
+				for(int r = 0; r < window; r++){
+					output[i][c*window+r] = data[i+r][c];
+				}
+			}
+		}
+		return output;
+	}
+
+	public static double[] column(double[][] data, int col){
+		double[] output = new double[data.length];
+		for(int i = 0; i < data.length; i++){
+			output[i] = data[i][col];
+		}
+		return output;
+	}
+
 	@Override
 	protected Series clone() {
-		Series copy = new Series();
-//		copy.data = new double[data.length];
-//		System.arraycopy(data, 0, copy.data, 0, data.length);
-		copy.cursor = cursor;
-//		copy.max = max;
-//		copy.min = min;
-		copy.stats = stats.copy();
-		return copy;
+		return new Series(cursor, stats.copy());
 	}
 }

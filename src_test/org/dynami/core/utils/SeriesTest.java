@@ -2,21 +2,32 @@ package org.dynami.core.utils;
 
 import org.dynami.core.data.Series;
 
+import java.util.Arrays;
+
 public class SeriesTest {
+	public  static void print(Object obj){
+		System.out.println(obj);
+	}
+
 	public static void main(String[] args) {
 		try {
-			double[] _data = {10.1, 10.4, 10.8, 10.1, 10, 9.8, 9.7, 10.5, 10.7, 10.1, 10.4, 10.8, 10.6};
-//			Series r1 = new Series(_data).lagAndDivide(1).omitNaN();
-//			System.out.println("------------");
-//			System.out.println(r1);
-			
-			Series s = new Series(_data);
-//			Series s1 = s.rollapply(DUtils::min, 3);
-			Series s2 = s.rollapply(Series::min, 3);
-//			double[] out1 = Series.rollapply(_data, DUtils::min, 3);
-			System.out.println(s.size()+ " - "+s2.size());
-			System.out.println(s);
-			System.out.println(s2);
+			final double[][] data = {
+					{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+					{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+					{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
+			};
+
+			double[][] out = Series.inline(data, 5);
+			for(double[] o : out){
+				print(Arrays.toString(o));
+			}
+
+			print("-------- colonna "+2);
+			print("");
+			double[] column = Series.column(out, 2);
+			print(Arrays.toString(column));
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
